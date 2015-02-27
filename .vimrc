@@ -51,6 +51,8 @@ Bundle 'jiangmiao/auto-pairs'
 
 Bundle 'Yggdroot/indentLine'
 
+Bundle 'airblade/vim-gitgutter'
+
 filetype plugin indent on
 
 call vundle#end()            " required
@@ -135,15 +137,13 @@ nnoremap tm  :tabm<Space>
 nnoremap td  :tabclose<CR>
 nnoremap to  :tabnew<CR>
 
-let NERDTreeMapOpenInTab='t'
-
 " Move Line Mapping
-nnoremap <A-j> :m .+1<CR>==
-nnoremap <A-k> :m .-2<CR>==
-inoremap <A-j> <Esc>:m .+1<CR>==gi
-inoremap <A-k> <Esc>:m .-2<CR>==gi
-vnoremap <A-j> :m '>+1<CR>gv=gv
-vnoremap <A-k> :m '<-2<CR>gv=gv
+nnoremap <C-l><Down> :m .+1<CR>==
+nnoremap <C-l><Up> :m .-2<CR>==
+inoremap <C-l><Down> <Esc>:m .+1<CR>==gi
+inoremap <C-l><Up> <Esc>:m .-2<CR>==gi
+vnoremap <C-l><Down> :m '>+1<CR>gv=gv
+vnoremap <C-l><Up> :m '<-2<CR>gv=gv
 
 " no ugly line wrap
 set nowrap
