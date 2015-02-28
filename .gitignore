@@ -3,5 +3,6 @@
 !.gitignore
 !.bashrc
 !.vimrc
-!.i3status
+!.i3status.conf
+!.i3/
 !.i3/config
