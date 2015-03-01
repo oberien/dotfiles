@@ -16,10 +16,14 @@ Bundle 'tpope/vim-fugitive'
 Bundle 'yearofmoo/Vim-Darkmate'
 " Sourround your code
 Bundle 'tpope/vim-surround'
+" auto add end keyword to ruby blocks
+Bundle 'tpope/vim-endwise'
 " plugin on GitHub repo
 Bundle 'kchmck/vim-coffee-script'
 " Editor Config
 Bundle 'editorconfig/editorconfig-vim'
+" RVM
+Bundle 'tpope/vim-rvm'
 " plugin from http://vim-scripts.org/vim/scripts.html
 Plugin 'L9'
 " file tree
@@ -34,6 +38,8 @@ Bundle 'scrooloose/syntastic'
 Bundle 'pangloss/vim-javascript'
 " Angular
 Bundle 'burnettk/vim-angular'
+" Close Tags
+Bundle 'vim-scripts/closetag.vim'
 " Templates in vim
 Bundle 'aperezdc/vim-template'
 " Tagbar support
