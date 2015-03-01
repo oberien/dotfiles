@@ -1,4 +1,5 @@
 TERM=xterm-color
+
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
@@ -29,7 +30,7 @@ shopt -s checkwinsize
 #shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
-#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -86,9 +87,9 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # some more ls aliases
-#alias ll='ls -l'
-#alias la='ls -A'
-#alias l='ls -CF'
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -116,5 +117,8 @@ export AMDAPPSDKSAMPLESROOT=/opt/AMDAPP/
 export LD_LIBRARY_PATH=${AMDAPPSDKROOT}lib/x86_64:${LD_LIBRARY_PATH}
 export ATISTREAMSDKROOT=$AMDAPPSDKROOT
 
-export PATH=$PATH:/root/programs/startscripts
-alias ida='wine /root/programs/ida66/idaq64.exe'
+export PATH=$PATH:/userpath/programs/startscripts
+alias ida='wine /userpath/programs/ida66/idaq64.exe'
+
+nvm use stable
+alias vi='vim'

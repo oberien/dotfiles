@@ -10,9 +10,16 @@
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
 set $mod Mod4
+set $Altgr Mod3
 
-# font for window titles. ISO 10646 = Unicode
+# Font for window titles. Will also be used by the bar unless a different font
+# is used in the bar {} block below. ISO 10646 = Unicode
 font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+# The font above is very space-efficient, that is, it looks good, sharp and
+# clear in small sizes. However, if you need a lot of unicode glyphs or
+# right-to-left text rendering, you should instead use pango for rendering and
+# chose a FreeType font, such as:
+# font pango:DejaVu Sans Mono 10
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -38,6 +45,12 @@ bindsym $mod+Down focus down
 bindsym $mod+Up focus up
 bindsym $mod+Right focus right
 
+# focus with the 4th neo arrow keys
+bindsym $mod+$Altgr+i focus left
+bindsym $mod+$Altgr+a focus down
+bindsym $mod+$Altgr+l focus up
+bindsym $mod+$Altgr+e focus right
+
 # move focused window
 bindsym $mod+Shift+J move left
 bindsym $mod+Shift+K move down
@@ -49,6 +62,12 @@ bindsym $mod+Shift+Left move left
 bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
+
+# move with 4th neo layer arrow keys
+bindsym $mod+Shift+$Altgr+i move left
+bindsym $mod+Shift+$Altgr+a move down
+bindsym $mod+Shift+$Altgr+l move up
+bindsym $mod+Shift+$Altgr+e move right
 
 # split in horizontal orientation
 bindsym $mod+h split h
