@@ -1,0 +1,8 @@
+[user]
+	name = Blackhole16
+	email = Blackhole16@web.de
+[fetch]
+	recurseSubmodules = true
+	prune = true
+[pull]
+	rebase = true

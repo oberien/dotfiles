@@ -1,8 +1,16 @@
+# Ignore Everything
 *
 
-!.gitignore
-!.bashrc
-!.vimrc
-!.i3status.conf
-!.i3/
-!.i3/config
+# Except these Files
+!/.gitignore
+!/.gitconfig
+!/.bashrc
+!/.bash_aliases
+!/.vimrc
+!/.i3status.conf
+
+!/.i3/config
+!/.ssh/config.tmpl
+
+# ...even if there are in subdirectories
+!*/

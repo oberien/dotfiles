@@ -117,8 +117,6 @@ export AMDAPPSDKSAMPLESROOT=/opt/AMDAPP/
 export LD_LIBRARY_PATH=${AMDAPPSDKROOT}lib/x86_64:${LD_LIBRARY_PATH}
 export ATISTREAMSDKROOT=$AMDAPPSDKROOT
 
-export PATH=$PATH:/userpath/programs/startscripts
-alias ida='wine /userpath/programs/ida66/idaq64.exe'
+export PATH=$PATH:/userPath/programs/startscripts
 
 nvm use stable
-alias vi='vim'
