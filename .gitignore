@@ -6,11 +6,16 @@
 !/.gitconfig
 !/.bashrc
 !/.bash_aliases
+!/.zshrc
+!/.zsh_alias
 !/.vimrc
+!/.ideavimrc
 !/.i3status.conf
-
 !/.i3/config
+
 !/.ssh/config.tmpl
+
+!/link.sh
 
 # ...even if there are in subdirectories
 !*/

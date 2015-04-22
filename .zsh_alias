@@ -1,0 +1,48 @@
+#alias em='emacs -nw'
+alias objdump='objdump -M intel-mnemonic'
+alias cp='cp --reflink=auto'
+alias ls='ls --color=auto'
+#alias diff='colordiff'
+alias grep='grep --color=auto'
+alias more='less'
+alias mkdir='mkdir -p -v'
+alias nano='nano -w -S -F -A'
+alias ..='cd ..'
+alias cd..='..'
+alias rd="cd $(pwd)"
+
+#alias sido='sudo'
+#alias psc='ps xawf -eo pid,user,cgroup,args'
+
+alias l='ls -Cf'
+alias la='ls -A'
+alias ll='ls -l'
+alias lal='ls -la'
+alias lla='ls -la'
+alias lr='ls -R'                    # recursive ls
+alias lx='ll -BX'                   # sort by extension
+alias lz='ll -rS'                   # sort by size
+alias lt='ll -rt'                   # sort by date
+alias lrandom="ls | sort -R | head -n 1"
+
+alias rm='rm -I'
+#alias chown='chown --preserve-root'
+#alias chmod='chmod --preserve-root'
+#alias chgrp='chgrp --preserve-root'
+
+#alias ls=' ls --color=auto'
+#alias nemo='nemo --no-desktop'
+
+alias git-graph="git log --pretty-format:'%Cred%d%Creset %s' --graph"
+
+alias -s tex=vim
+alias -s html=elinks
+alias -s sh=vim
+
+alias dh=' dirs -v'
+
+alias pacman='sudo pacman'
+alias systemctl='sudo systemctl'
+alias oclhashcat='sudo oclHashcat'
+alias mount='sudo mount'
+alias umount='sudo umount'
