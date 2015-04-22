@@ -5,6 +5,8 @@ ln -s ~/dotfiles/.zsh_alias ~/.zsh_alias
 mkdir ~/.i3
 ln -s ~/dotfiles/.i3/config ~/.i3/config
 ln -s ~/dotfiles/.i3status.conf ~/.i3status.conf
+ln -s ~/dotfiles/.xinitrc ~/.xinitrc
+ln -s ~/dotfiles/.Xresources ~/.Xresources
 ln -s ~/dotfiles/.vimrc ~/.vimrc
 ln -s ~/dotfiles/.ideavimrc ~/.ideavimrc
 mkdir ~/.vim/
