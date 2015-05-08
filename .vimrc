@@ -59,6 +59,8 @@ Bundle 'Yggdroot/indentLine'
 
 Bundle 'airblade/vim-gitgutter'
 
+Bundle 'xuhdev/vim-latex-live-preview'
+
 filetype plugin indent on
 
 call vundle#end()            " required

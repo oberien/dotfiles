@@ -18,23 +18,20 @@ export EDITOR=$VISUAL
 export PAGER="less"
 export SHELL="/bin/zsh"
 
-#export PATH="$PATH:/home/jj/scripts"
-
 #export GPGKEY="FA2292AF"
 export GPSD_UNITS=metric
 #export LC_MEASUREMENT=metric
 #export SSLKEYLOGFILE=$HOME/.ssl-log
 
-#export PYTHONSTARTUP="$HOME/.pyrc"
-
 # see man zsh, reports cpu/system/etc usage if running longer then
 REPORTTIME=1
 
+# aliases
 source /home/niobe/.zsh_alias
 
 #general shell options
-setopt extended_glob longlistjobs completeinword completealiases hashlistall bash_rematch nohup nobeep
-unsetopt autocd beep notify
+setopt autocd extended_glob longlistjobs completeinword completealiases hashlistall bash_rematch nohup nobeep
+unsetopt beep notify
 
 #command history
 HISTFILE=~/.zsh-histfile
@@ -87,8 +84,11 @@ bashcompinit
 
 
 #manpages
-zstyle ':completion:*:manuals'    separate-sections true
-zstyle ':completion:*:manuals.*'  insert-sections   true
+#zstyle ':completion:*:manuals'    separate-sections true
+#zstyle ':completion:*:manuals.*'  insert-sections   true
+#zstyle ':completion:*:man:*'      menu yes select
+zstyle ':completion:*:manuals'    separate-sections false
+zstyle ':completion:*:manuals.*'  insert-sections   false
 zstyle ':completion:*:man:*'      menu yes select
 
 #processes
@@ -321,4 +321,5 @@ precmd () {
 PROMPT="%B%{$fg[green]%}%n%{$fg[cyan]%}@%{$fg[blue]%}%m%b %{$fg[red]%}%~ %{$fg[yellow]%}%1v%2v%{$reset_color%}%# "
 RPROMPT="%3v%4v%{$reset_color%}[%{$fg[yellow]%}%?%{$reset_color%}]%1v%{$fg[blue]%}:%{$fg[red]%}%l%{$reset_color%} "
 
-
+source /usr/share/nvm/init-nvm.sh
+nvm use stable

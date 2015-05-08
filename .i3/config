@@ -14,12 +14,12 @@ set $Altgr Mod3
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below. ISO 10646 = Unicode
-font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+#font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 # The font above is very space-efficient, that is, it looks good, sharp and
 # clear in small sizes. However, if you need a lot of unicode glyphs or
 # right-to-left text rendering, you should instead use pango for rendering and
 # chose a FreeType font, such as:
-# font pango:DejaVu Sans Mono 10
+font pango:DejaVu Sans Mono 10
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -162,13 +162,18 @@ bindsym XF86AudioRaiseVolume exec --no-startup-id /usr/bin/pulseaudio-ctl up 1
 bindsym XF86AudioLowerVolume exec --no-startup-id /usr/bin/pulseaudio-ctl down 1
 bindsym XF86AudioMute exec --no-startup-id /usr/bin/pulseaudio-ctl mute
 
+bindsym XF86Sleep exec --no-startup-id i3lock
+
 bindcode --release 69 exec --no-startup-id setxkbmap de
 bindcode --release 70 exec --no-startup-id setxkbmap de neo
+
+bindcode --release 120 exec --no-startup-id xset dpms force standby
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command i3status
+        #status_command i3status
+        status_command python ~/.i3/bar.py
 }
 
 exec nm-applet
