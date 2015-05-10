@@ -1,0 +1,112 @@
+! Xresources, optimized for urxvt, to make it vergil
+! composed by [SFT]TheJJ and [SFT]mic_e
+! released under GNU GPLv3+
+
+! Xcursor.theme: Simple-and-Soft
+
+URxvt.depth: 32
+URxvt.background: rgba:0000/1800/0000/dddd
+URxvt.foreground: White
+
+!// see /usr/share/fonts/misc/fonts.alias
+! naais:
+!URxvt.font: 8x13
+!URxvt.font: xft:terminus:size=10
+!pixelsize=15:antialias=true:hinting=true
+urxvt*skipBuiltinGlyphs: true
+
+urxvt*font: xft:DejaVu Sans Mono:style=Book:antialias=false:size=8, \
+            xft:WenQuanYi Bitmap Song:size=8, \
+            xft:FreeSerif:style=Regular, \
+            xft:unifont:style=Medium:antialias=false, \
+            xft:Symbola
+
+urxvt*boldFont: xft:DejaVu Sans Mono:style=Book:antialias=false:size=8, \
+                xft:WenQuanYi Bitmap Song:size=8, \
+                xft:unifont:style=Medium:antialias=false
+
+urxvt*italicFont: xft:DejaVu Sans Mono:style=Book:antialias=false:size=8, \
+                  xft:WenQuanYi Bitmap Song:size=8, \
+                  xft:unifont:style=Medium:antialias=false
+
+urxvt*boldItalicFont: xft:DejaVu Sans Mono:style=Book:antialias=false:size=8, \
+                      xft:WenQuanYi Bitmap Song:size=8, \
+                      xft:unifont:style=Medium:antialias=false
+
+!// URxvt.transparent: true
+!// URxvt.shading: 10 // 0 to 99 darkens, 101 to 200 lightens
+
+! scrollbar style - rxvt (default), plain (most compact), next, or xterm
+URxvt.scrollstyle: rxvt
+URxvt.scrollBar_right: true
+
+URxvt*iso14755: False
+URxvt*iso14755_52: False
+
+! perl extensions
+URxvt.perl-ext-common: default,url-select,clipboard,keyboard-select,matcher,vtwheel
+
+URxvt.keysym.S-C-U: perl:url-select:select_next
+URxvt.underlineURLs: true
+URxvt.url-select.underline: true
+URxvt.matcher.button: 1
+URxvt.url-launcher: /usr/bin/opera
+
+URxvt.keysym.Shift-Control-C: perl:clipboard:copy
+URxvt.keysym.Shift-Control-V: perl:clipboard:paste
+
+URxvt.keysym.Shift-Control-S: perl:keyboard-select:search
+URxvt.keysym.Shift-Control-A: perl:keyboard-select:activate
+URxvt.keysym.M-u:             perl:url-select:select_next
+URxvt.keysym.M-Escape:        perl:keyboard-select:activate
+URxvt.keysym.M-s:             perl:keyboard-select:search
+
+!window bell via white flash
+URxvt.visualBell: false
+
+!better scrolling behaviour
+URxvt.scrollTtyOutput: false
+URxvt.scrollTtyKeypress: true
+URxvt.scrollWithBuffer: true
+
+!when secondary application scrolls, dont remember lines
+URxvt.secondaryScroll: false
+
+!enables secondary scrolling in e.g. man
+URxvt.secondaryWheel: true
+URxvt.secondaryScreen: true
+
+!delimiter chars for double click selection
+Urxvt.cutchars: ()*,<>[]{}|
+
+!scrollback buffer size
+URxvt.saveLines: 50000
+
+
+! enable keypad geraffel
+URxvt.keysym.KP_Add:  +
+URxvt.keysym.KP_Subtract: -
+URxvt.keysym.KP_Multiply: *
+URxvt.keysym.KP_Divide:   /
+URxvt.keysym.KP_Decimal:  .
+URxvt.keysym.KP_Separator: ,
+URxvt.keysym.KP_1:  1
+URxvt.keysym.M-KP_1:  \0331
+URxvt.keysym.KP_2:  2
+URxvt.keysym.M-KP_2:  \0332
+URxvt.keysym.KP_3:  3
+URxvt.keysym.M-KP_3:  \0333
+URxvt.keysym.KP_4:  4
+URxvt.keysym.M-KP_4:  \0334
+URxvt.keysym.KP_5:  5
+URxvt.keysym.M-KP_5:  \0335
+URxvt.keysym.KP_6:  6
+URxvt.keysym.M-KP_6:  \0336
+URxvt.keysym.KP_7:  7
+URxvt.keysym.M-KP_7:  \0337
+URxvt.keysym.KP_8:  8
+URxvt.keysym.M-KP_8:  \0338
+URxvt.keysym.KP_9:  9
+URxvt.keysym.M-KP_9:  \0339
+URxvt.keysym.KP_0:  0
+URxvt.keysym.M-KP_0:  \0330
