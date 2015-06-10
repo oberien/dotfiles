@@ -111,7 +111,7 @@ for line in runProcess('i3status'):
         m = m.split(" ")
         ymd = m[1].split("/")
         moon = moon_phase(int(ymd[2]), int(ymd[0]), int(ymd[1]))
-        sun = icons2[3][h//4 % 6]
+        sun = icons2[3][h//5]
         obj[7][s] = icons[7][hm*2+t] + " " + m[0] + " " + sun + " " + icons2[4] + " " + m[1] + " " + chr(moon+0x1F311)
 
         brightness = {"name": "brightness"}
