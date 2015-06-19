@@ -1,0 +1,9 @@
+if [ -e /usr/bin/apt-get ]
+then
+  sudo apt-get install xsel
+elif [ -e /usr/bin/pacman ]
+then
+  sudo pacman -S xsel
+fi
+sudo wget https://github.com/muennich/urxvt-perls/raw/master/clipboard -O /usr/lib/urxvt/perl/clipboard
+
