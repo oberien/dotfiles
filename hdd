@@ -1,0 +1,49 @@
+#!/bin/bash
+
+mnt() {
+  if [ ! -e /dev/mmcblk0p1 ]
+    then
+      echo "No Keyfiles found -- exiting"
+      exit 1
+  fi
+
+  cryptsetup open /dev/mmcblk0p1 keys
+
+  if [ ! -e /keys ]
+    then
+      mkdir /keys
+  fi
+  mount /dev/mapper/keys /keys
+  cryptsetup open -d /keys/keyfile_hdd /dev/sdb3 hdd
+  mount /dev/mapper/hdd /hdd
+  umount /keys
+  cryptsetup close keys
+  sync
+
+  #linking all the stuff
+  
+}
+
+umnt() {
+  umount /hdd
+  cryptsetup close hdd
+}
+
+
+if [ "$(id -u)" != "0" ]
+  then
+    echo "This script must be run as root -- please use sudo"
+    exit 1
+fi
+
+if [ "$1" = "mount" ]
+  then
+    mnt
+elif [ "$1" = "umount" ]
+  then
+    umnt
+else
+    echo "Wrong command -- only accept ['mount', 'umount']"
+fi
+
+

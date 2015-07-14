@@ -60,6 +60,8 @@ Bundle 'Yggdroot/indentLine'
 Bundle 'airblade/vim-gitgutter'
 
 Bundle 'xuhdev/vim-latex-live-preview'
+" Rust syntax highlighting
+Bundle 'rust-lang/rust.vim'
 
 filetype plugin indent on
 
@@ -143,7 +145,7 @@ nnoremap t<Down>  :tablast<CR>
 nnoremap tt  :tabedit<Space>
 nnoremap tm  :tabm<Space>
 nnoremap td  :tabclose<CR>
-nnoremap to  :tabnew<CR>
+nnoremap to  :NERDTreeClose <bar> tabnew<CR>
 
 " Move Line Mapping
 nnoremap <C-l><Down> :m .+1<CR>==

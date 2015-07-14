@@ -1,0 +1,33 @@
+#!/bin/bash
+
+run_hook() {
+if [ ! -e /dev/mmcblk0p1 ]
+    then
+        echo -n No Keyfiles found -- please insert SD-Drive and press return...
+        read
+fi
+
+if [ ! -e /dev/mmcblk0p1 ]
+    then
+        echo -n pre-poweroff
+        read
+        poweroff
+	echo -n post-poweroff, pre-shutdown -P
+	read
+	shutdown -P now "No Keyfile found"
+	echo -n post-shutdown, fucked up
+	read
+fi
+
+cryptsetup -T 3 open /dev/mmcblk0p1 keyfile
+mkdir /keypart
+mount /dev/mapper/keyfile /keypart
+ln -s /keypart/keyfile_system /crypto_keyfile.bin
+}
+
+run_latehook() {
+cryptsetup open -d /keypart/keyfile_swap /dev/sda2 swap
+umount /keypart
+cryptsetup close keyfile
+rm -r /keypart
+}
