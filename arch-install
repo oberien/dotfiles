@@ -50,68 +50,46 @@ _EOF_
 
 pacman -S python3
 pacman -S python2
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
-pacman -S 
+pacman -S arandr
+pacman -S ttf-dejavu
+pacman -S opera
+pacman -S wget
+
+# yaourt
+curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/package-query.tar.gz
+tar -xvzf package-query.tar.gz
+cd package-query
+makepkg -si
+cd ..
+rm -r package-query package-query.tar.gz
+curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/yaourt.tar.gz
+tar -xvzf yaourt.tar.gz
+cd yaourt
+makepkg -si
+cd ..
+rm -r yaourt yaourt.tar.gz
+
+yaourt -S vivaldi
+pacman -S ffmpeg
+pacman -S vlc
+yaourt -S livestreamer
+pacman -S mumble
+pacman -S pulseaudio
+pacman -S pavucontrol
+
+# enable multilib in /etc/pacman.conf
+pacman -Syu
+yaourt -S steam
+pacman -S evince
+pacman -S feh
+pacman -S imagemagick
+yaourt -S catalyst
+pacman -S thunderbird
+pacman -S skype
+pacman -S pidgin pidgin-otr
+pacman -S openssh
+pacman -S htop iotop
+pacman -S unzip
+pacman -S nmap
+pacman -S mlocate
+pacman -S gedit
