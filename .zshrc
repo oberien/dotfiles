@@ -27,7 +27,7 @@ export GPSD_UNITS=metric
 REPORTTIME=1
 
 # aliases
-source /home/niobe/.zsh_alias
+source ~/.zsh_alias
 
 #general shell options
 setopt autocd extended_glob longlistjobs completeinword completealiases hashlistall bash_rematch nohup nobeep
