@@ -1,0 +1,117 @@
+#!/bin/bash
+# when formatting partitions, use GPT and add an 'EFI System' 100M partition
+
+
+# pacstrap
+pacstrap -i /mnt base base-devel zsh git net-tools networkmanager gummiboot xorg-xserver xorg-xinit xorg-utils xorg-server-utils rxvt-unicode i3 dmenu autocutsel gvim cmake
+genfstab -U /mnt > /mnt/etc/fstab
+cat /mnt/etc/fstab
+
+arch-chroot /mnt /bin/zsh
+
+# locale
+nano /etc/locale.gen # uncomment de_DE UTF-8
+locale-gen
+echo LANG=de_DE.UTF-8 > /etc/locale.conf
+echo -e "KEYMAP=de-latin1\nFONT=lat9w-16" > /etc/vconsole.conf
+ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+hwclock --systohc --utc
+
+# hostname
+echo myhostname > /etc/hostname
+nano /etc/hosts # add 'myhostname' to end of each line
+
+# setup boot
+gummiboot install
+gummiboot update
+
+# create user
+useradd NAME -m -g users -G wheel -s /bin/zsh 
+
+# dotfiles 'n stuff
+  # change user to created one
+  # setup dotfiles
+  # setup paranoid_link
+  # edit files for paranoid stuff
+mkinitcpio -p linux
+cat <<_EOF_ > /boot/loader/entries/arch.conf
+title       Arch Linux
+linux       /vmlinuz-linux
+initrd      /initramfs-linux.img
+options     cryptdevice=/dev/sda3:system root=/dev/mapper/system
+_EOF_
+
+nano /boot/loader/entries/arch.conf # adapt /dev/sdXX
+
+cat <<_EOF_ > /boot/loader/loader.conf
+default arch
+timeout 0
+_EOF_
+
+pacman -S python3
+pacman -S python2
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
+pacman -S 
