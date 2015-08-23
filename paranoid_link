@@ -3,3 +3,4 @@
 sudo ln -s ~/dotfiles/paranoid/hooks/lukskey /etc/initcpio/hooks/lukskey
 sudo ln -s ~/dotfiles/paranoid/install/lukskey /etc/initcpio/install/lukskey
 sudo ln -s ~/dotfiles/hdd /usr/local/bin/hdd
+sudo ln -s ~/dotfiles/paranoid/mkinitcpio.conf /etc/mkinitcpio.conf
