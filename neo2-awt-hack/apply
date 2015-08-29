@@ -1,0 +1,1 @@
+echo "-Xbootclasspath/p:$(echo ~)/dotfiles/neo2-awt-hack/neo2-awt-hack-0.4-java8oracle.jar" | sudo tee -a /usr/share/intellij-idea-ultimate-edition/bin/idea64.vmoptions

@@ -75,33 +75,70 @@ for line in runProcess('i3status'):
         print('[')
 
     else:
+        res = []
         start = 2 + (i>3)
         line = str(line)[start:-3]
 
         obj = json.loads(line)
 
+        brightness = {"name": "brightness"}
+        try:
+            with open("/sys/class/backlight/acpi_video0/actual_brightness", 'r') as f:
+                b = int(f.read().replace("\n", ""))
+            brightness[s] = icons2[0][min(b, 99)//50] + " " + str(b) 
+            res.append(brightness)
+        except FileNotFoundError:
+            pass
+
         m = obj[0][s]
         obj[0][s] = icons[0] + " " + m
+        res.append(obj[0])
 
         m = obj[1][s]
         obj[1][s] = icons[1] + (x if m == "" else " " + m)
+        res.append(obj[1])
 
         m = obj[2][s]
         obj[2][s] = icons[2] + (x if m == "" else " " + m)
+        res.append(obj[2])
 
         m = obj[3][s]
         obj[3][s] = icons[3] + (x if m == "" else " " + m)
+        res.append(obj[3])
 
-        m = obj[4][s].split(" ")
-        c = m[0]
-        m = m[1]
-        obj[4][s] = icons[4][c] + " " + m
+        m = obj[4][s]
+        if (m != "No battery"):
+            m = m.split(" ")
+            c = m[0]
+            m = m[1]
+            obj[4][s] = icons[4][c] + " " + m
+            res.append(obj[4])
 
         m = obj[5][s]
         obj[5][s] = icons[5] + " " + m
+        res.append(obj[5])
+
+        meminfo = {"name": "meminfo"}
+        with (open("/proc/meminfo", 'r')) as f:
+            mem = f.read()
+        mem = "{\"" + mem.replace("\n", "\",\"").replace(":", "\":\"")[:-2] + "}"
+        mem = json.loads(mem)
+        total = int(mem["MemTotal"].split(" ")[-2])
+        avail = int(mem["MemAvailable"].split(" ")[-2])
+        used = total - avail
+        meminfo[s]  = icons2[1] + " " + convertKB(used) + "/" + convertKB(total)
+        res.append(meminfo)
 
         m = obj[6][s]
         obj[6][s] = icons[6]["color" in obj[6] and obj[6]["color"] == "#FF0000"] + " " + m
+        res.append(obj[6])
+
+        swap = {"name": "swap"}
+        total = int(mem["SwapTotal"].split(" ")[-2])
+        avail = int(mem["SwapFree"].split(" ")[-2])
+        used = total - avail
+        swap[s]  = icons2[2] + " " + convertKB(used) + "/" + convertKB(total)
+        res.append(swap)
 
         m = obj[7][s]
         h = int(m[:2])
@@ -113,30 +150,7 @@ for line in runProcess('i3status'):
         moon = moon_phase(int(ymd[2]), int(ymd[0]), int(ymd[1]))
         sun = icons2[3][h//5]
         obj[7][s] = icons[7][hm*2+t] + " " + m[0] + " " + sun + " " + icons2[4] + " " + m[1] + " " + chr(moon+0x1F311)
+        res.append(obj[7])
 
-        brightness = {"name": "brightness"}
-        with open("/sys/class/backlight/acpi_video0/actual_brightness", 'r') as f:
-            b = int(f.read().replace("\n", ""))
-        brightness[s] = icons2[0][min(b, 99)//50] + " " + str(b) 
-        obj.insert(0, brightness)
-
-        meminfo = {"name": "meminfo"}
-        with (open("/proc/meminfo", 'r')) as f:
-            mem = f.read()
-        mem = "{\"" + mem.replace("\n", "\",\"").replace(":", "\":\"")[:-2] + "}"
-        mem = json.loads(mem)
-        total = int(mem["MemTotal"].split(" ")[-2])
-        avail = int(mem["MemAvailable"].split(" ")[-2])
-        used = total - avail
-        meminfo[s]  = icons2[1] + " " + convertKB(used) + "/" + convertKB(total)
-        obj.insert(6, meminfo)
-
-        swap = {"name": "swap"}
-        total = int(mem["SwapTotal"].split(" ")[-2])
-        avail = int(mem["SwapFree"].split(" ")[-2])
-        used = total - avail
-        swap[s]  = icons2[2] + " " + convertKB(used) + "/" + convertKB(total)
-        obj.insert(7, swap)
-
-        print(("," if i > 3 else "") + json.dumps(obj))
+        print(("," if i > 3 else "") + json.dumps(res))
     sys.stdout.flush()

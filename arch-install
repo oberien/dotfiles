@@ -93,3 +93,25 @@ pacman -S unzip
 pacman -S nmap
 pacman -S mlocate
 pacman -S gedit
+pacman -S pm-utils
+yaourt -S rust-nightly-bin
+pacman -S tree
+pacman -S dosfstools
+pacman -S ntfs-3g
+
+pacman -S mariadb
+
+# java
+pacman -S jdk8-openjdk
+pacman -S openjdk8-src
+pacman -S openjdk8-doc
+yaourt -S intellij-idea-ultimate-edition
+
+# rust
+pacman -S rust-racer-git
+pacman -S rust-src
+
+
+
+# maybe
+pacman -S gparted

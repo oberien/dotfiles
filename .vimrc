@@ -62,6 +62,8 @@ Bundle 'airblade/vim-gitgutter'
 Bundle 'xuhdev/vim-latex-live-preview'
 " Rust syntax highlighting
 Bundle 'rust-lang/rust.vim'
+" Rust autocompletion
+Plugin 'phildawes/racer'
 
 filetype plugin indent on
 
@@ -160,3 +162,6 @@ set nowrap
 
 set history=200
 
+set hidden
+ let g:racer_cmd = "/usr/bin/racer"
+ let $RUST_SRC_PATH="/usr/src/rust/src/"

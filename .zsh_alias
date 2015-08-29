@@ -48,3 +48,10 @@ alias mount='sudo mount'
 alias umount='sudo umount'
 alias updatedb='sudo updatedb'
 alias fucking='sudo'
+
+# vlc rc
+alias rcplaylist='echo -n "playlist\nquit" | ncat ::1 20000 | grep -oP "\d+ -[\s\w\-]*"'
+rcgotofn() {
+  echo "goto $1" | ncat ::1 20000 > /dev/null
+}
+alias rcgoto=rcgotofn
