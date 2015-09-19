@@ -181,8 +181,8 @@ bindsym XF86AudioNext exec --no-startup-id bash -c "echo next > /dev/tcp/localho
 
 bindsym XF86Sleep exec --no-startup-id i3lock
 
-bindcode --release 69 exec --no-startup-id setxkbmap de
-bindcode --release 70 exec --no-startup-id setxkbmap de neo
+bindsym $mod+F11 exec --no-startup-id setxkbmap de
+bindsym $mod+F12 exec --no-startup-id setxkbmap de neo
 
 bindcode --release 120 exec --no-startup-id xset dpms force standby
 

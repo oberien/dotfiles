@@ -52,8 +52,9 @@ pacman -S python3
 pacman -S python2
 pacman -S arandr
 pacman -S ttf-dejavu
-pacman -S opera
 pacman -S wget
+pacman -S openssh
+pacman -S openvpn
 
 # yaourt
 curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/package-query.tar.gz
@@ -69,37 +70,47 @@ makepkg -si
 cd ..
 rm -r yaourt yaourt.tar.gz
 
-yaourt -S vivaldi
-pacman -S ffmpeg
-pacman -S vlc
-yaourt -S livestreamer
-pacman -S mumble
-pacman -S pulseaudio
-pacman -S pavucontrol
+# drivers
+yaourt -S catalyst
+yaourt -S lib32-catalyst-utils
 
-# enable multilib in /etc/pacman.conf
-pacman -Syu
-yaourt -S steam
+# browser
+yaourt -S vivaldi
+pacman -S opera
+pacman -S firefox
+pacman -S gst-libav
+
+# important others
 pacman -S evince
 pacman -S feh
 pacman -S imagemagick
-yaourt -S catalyst
-pacman -S thunderbird
-pacman -S skype
-pacman -S pidgin pidgin-otr
-pacman -S openssh
 pacman -S htop iotop
 pacman -S unzip
 pacman -S nmap
 pacman -S mlocate
 pacman -S gedit
 pacman -S pm-utils
-yaourt -S rust-nightly-bin
 pacman -S tree
 pacman -S dosfstools
 pacman -S ntfs-3g
-
 pacman -S mariadb
+
+# others
+pacman -S ffmpeg
+pacman -S vlc
+yaourt -S livestreamer
+pacman -S mumble
+pacman -S pulseaudio
+pacman -S pavucontrol
+pacman -S thunderbird
+pacman -S skype
+pacman -S pidgin pidgin-otr
+
+
+# steam
+# enable multilib in /etc/pacman.conf
+pacman -Syu
+yaourt -S steam
 
 # java
 pacman -S jdk8-openjdk
@@ -108,10 +119,9 @@ pacman -S openjdk8-doc
 yaourt -S intellij-idea-ultimate-edition
 
 # rust
+yaourt -S rust-nightly-bin
 pacman -S rust-racer-git
 pacman -S rust-src
-
-
 
 # maybe
 pacman -S gparted

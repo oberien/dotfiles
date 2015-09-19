@@ -50,7 +50,7 @@ alias updatedb='sudo updatedb'
 alias fucking='sudo'
 
 # vlc rc
-alias rcplaylist='echo -n "playlist\nquit" | ncat ::1 20000 | grep -oP "\d+ -[\s\w\-]*"'
+alias rclist='echo -n "playlist\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"'
 rcgotofn() {
   echo "goto $1" | ncat ::1 20000 > /dev/null
 }
