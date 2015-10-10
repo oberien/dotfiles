@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import socket
 import json
 from math import log
 
@@ -65,7 +66,9 @@ icons = ["\U0001F4BD", "\U0001F500", "\U0001F4F6", "\U0001F5A7",
             "\U0001F559","\U0001F565","\U0001F55A","\U0001F566"]]
 icons2 = [["\U0001F505", "\U0001F506"], "\U0001F40F", "\U0001F4BE",
         ["\U0001F303", "\U0001F306", "\U0001F305", "\U0000263C", "\U0001F307"],
-        "\U0001F4C6"]
+        "\U0001F4C6",
+        # vlc rc play/paused
+        {"playing": "\U0000266B", "paused": "\U000023F8"}]
 for line in runProcess('i3status'):
     i += 1
     if (i == 1):
@@ -75,12 +78,14 @@ for line in runProcess('i3status'):
         print('[')
 
     else:
+        # prepare vars
         res = []
         start = 2 + (i>3)
         line = str(line)[start:-3]
 
         obj = json.loads(line)
 
+        # brightness
         brightness = {"name": "brightness"}
         try:
             with open("/sys/class/backlight/acpi_video0/actual_brightness", 'r') as f:
@@ -88,6 +93,26 @@ for line in runProcess('i3status'):
             brightness[s] = icons2[0][min(b, 99)//50] + " " + str(b) 
             res.append(brightness)
         except FileNotFoundError:
+            pass
+
+        # current song
+        currSong = {"name": "current_song"}
+        sock = socket.socket()
+        try:
+            sock.connect(("localhost", 20000))
+            sock.sendall(bytes('status\n', "UTF-8"))
+            file = sock.makefile("r")
+            while True:
+                line = file.readline()
+                if "new input:" in line:
+                    currSong[s] = line[line.rfind("/")+1:line.rfind(".")]
+                if "state" in line:
+                    state = line[line.find("state")+6:line.rfind(" ")]
+                    currSong[s] = icons2[5][state] + " " + currSong[s]
+                    break
+            sock.close()
+            res.append(currSong)
+        except ConnectionRefusedError:
             pass
 
         m = obj[0][s]
