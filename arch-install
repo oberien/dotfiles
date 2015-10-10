@@ -52,6 +52,7 @@ pacman -S python3
 pacman -S python2
 pacman -S arandr
 pacman -S ttf-dejavu
+pacman -S ttf-symbola
 pacman -S wget
 pacman -S openssh
 pacman -S openvpn
@@ -94,6 +95,7 @@ pacman -S tree
 pacman -S dosfstools
 pacman -S ntfs-3g
 pacman -S mariadb
+pacman -S dnsutils
 
 # others
 pacman -S ffmpeg
@@ -111,6 +113,10 @@ pacman -S pidgin pidgin-otr
 # enable multilib in /etc/pacman.conf
 pacman -Syu
 yaourt -S steam
+
+# other fonts used for games/wine
+yaourt -S ttf-tahoma
+yaourt -S ttf-ms-fonts
 
 # java
 pacman -S jdk8-openjdk
