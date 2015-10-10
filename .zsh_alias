@@ -51,7 +51,9 @@ alias fucking='sudo'
 
 # vlc rc
 alias rclist='echo -n "playlist\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"'
-rcgotofn() {
+__rcgotofn() {
   echo "goto $1" | ncat ::1 20000 > /dev/null
 }
-alias rcgoto=rcgotofn
+alias rcgoto=__rcgotofn
+alias rcstatus='echo -n "status\nquit" | ncat ::1 20000 | grep -E "> \( |\( " | sed -E "s/> //" | sed -E "s/\( (.*) \)/\1/"'
+alias rcinfo='echo -n "info\nquit" | ncat ::1 20000 | grep -E "\|" | sed -E "s/\| //" | sed -E "/^\|[^ ]/d"'
