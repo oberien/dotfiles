@@ -3,7 +3,7 @@
 
 
 # pacstrap
-pacstrap -i /mnt base base-devel zsh git net-tools networkmanager gummiboot xorg-xserver xorg-xinit xorg-utils xorg-server-utils rxvt-unicode i3 dmenu autocutsel gvim cmake
+pacstrap -i /mnt base base-devel zsh git net-tools networkmanager xorg-xserver xorg-xinit xorg-utils xorg-server-utils rxvt-unicode i3 dmenu autocutsel gvim cmake
 genfstab -U /mnt > /mnt/etc/fstab
 cat /mnt/etc/fstab
 
@@ -22,8 +22,8 @@ echo myhostname > /etc/hostname
 nano /etc/hosts # add 'myhostname' to end of each line
 
 # setup boot
-gummiboot install
-gummiboot update
+bootctl install
+bootctl update
 
 # create user
 useradd NAME -m -g users -G wheel -s /bin/zsh 
@@ -105,7 +105,7 @@ pacman -S mumble
 pacman -S pulseaudio
 pacman -S pavucontrol
 pacman -S thunderbird
-pacman -S skype
+yaourt -S skype
 pacman -S pidgin pidgin-otr
 
 
@@ -126,8 +126,8 @@ yaourt -S intellij-idea-ultimate-edition
 
 # rust
 yaourt -S rust-nightly-bin
-pacman -S rust-racer-git
-pacman -S rust-src
+yaourt -S rust-racer-git
+yaourt -S rust-src
 
 # maybe
 pacman -S gparted
