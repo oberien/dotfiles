@@ -1,5 +1,50 @@
 #!/bin/bash
-# when formatting partitions, use GPT and add an 'EFI System' 100M partition
+
+loadkeys de-latin1
+setfont lat9w-16
+
+# setup partitions
+fdisk /dev/device
+    # GPT, needed for EFI
+    g
+    # boot
+    n
+        1
+        default
+        +100M
+    t
+        1
+    # SWAP
+    n
+        2
+        default
+        +32G
+    t
+        2
+        19
+    # Linux System
+    n
+        3
+        default
+        +256G
+    w
+
+# crypto
+cryptsetup -vd keyfile luksFormat /dev/device3
+cryptsetup open -d keyfile /dev/device3 system
+
+# format
+mkfs.ext4 /dev/mapper/system
+mkfs.fat -F32 /dev/device1
+# swap
+mkswap /dev/device2
+swapon /dev/device2
+
+# mount everything
+mount /dev/mapper/system /mnt
+mount /dev/device
+mkdir /mnt/boot
+mount /dev/device1 /mnt/boot
 
 
 # pacstrap
@@ -10,9 +55,9 @@ cat /mnt/etc/fstab
 arch-chroot /mnt /bin/zsh
 
 # locale
-nano /etc/locale.gen # uncomment de_DE UTF-8
+nano /etc/locale.gen # uncomment en_US.UTF-8 UTF-8
 locale-gen
-echo LANG=de_DE.UTF-8 > /etc/locale.conf
+echo LANG=en_US.UTF-8 > /etc/locale.conf
 echo -e "KEYMAP=de-latin1\nFONT=lat9w-16" > /etc/vconsole.conf
 ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 hwclock --systohc --utc
@@ -27,6 +72,7 @@ bootctl update
 
 # create user
 useradd NAME -m -g users -G wheel -s /bin/zsh 
+nano /etc/sudoers # uncomment %wheel
 
 # dotfiles 'n stuff
   # change user to created one
@@ -117,9 +163,10 @@ pacman -S pidgin pidgin-otr
 pacman -Syu
 yaourt -S steam
 
-# other fonts used for games/wine
+# other fonts used for games/wine/vim
 yaourt -S ttf-tahoma
 yaourt -S ttf-ms-fonts
+yaourt -S ttf-dejavu-sans-mono-powerline-git
 
 # java
 pacman -S jdk8-openjdk
