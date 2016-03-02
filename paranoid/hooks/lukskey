@@ -1,33 +1,37 @@
 #!/bin/bash
 
+UUID="30a65847-0e31-4c1c-85b1-3f6c9f9ff4e1"
+DEVICE="/dev/disk/by-uuid/$UUID"
+
 run_hook() {
-if [ ! -e /dev/mmcblk0p1 ]
-    then
-        echo -n No Keyfiles found -- please insert SD-Drive and press return...
-        read
-fi
+  if [ ! -e $DEVICE ]
+      then
+          echo -n No Keyfiles found -- please insert USB-Drive and press return...
+          read
+  fi
 
-if [ ! -e /dev/mmcblk0p1 ]
-    then
-        echo -n pre-poweroff
-        read
-        poweroff
-	echo -n post-poweroff, pre-shutdown -P
-	read
-	shutdown -P now "No Keyfile found"
-	echo -n post-shutdown, fucked up
-	read
-fi
+  if [ ! -e $DEVICE ]
+      then
+          echo -n pre-poweroff
+          read
+          poweroff
+    echo -n post-poweroff, pre-shutdown -P
+    read
+    shutdown -P now "No Keyfile found"
+    echo -n post-shutdown, fucked up
+    read
+  fi
 
-cryptsetup -T 3 open /dev/mmcblk0p1 keyfile
-mkdir /keypart
-mount /dev/mapper/keyfile /keypart
-ln -s /keypart/keyfile_system /crypto_keyfile.bin
+  cryptsetup -T 3 open $DEVICE keys
+  mkdir /keys
+  mount /dev/mapper/keys /keys
+  ln -s /keys/keyfile_system /crypto_keyfile.bin
 }
 
 run_latehook() {
-cryptsetup open -d /keypart/keyfile_swap /dev/sda2 swap
-umount /keypart
-cryptsetup close keyfile
-rm -r /keypart
+  cryptsetup open -d /keys/keyfile_swap /dev/nvme0n1p2 swap
+  umount /keys
+  cryptsetup close keys
+  rm -r /keys
 }
+

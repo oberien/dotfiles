@@ -1,32 +1,72 @@
 #!/bin/bash
 
-mnt() {
-  if [ ! -e /dev/mmcblk0p1 ]
+CRYPTUUID="30a65847-0e31-4c1c-85b1-3f6c9f9ff4e1"
+CRYPTDEVICE="/dev/disk/by-uuid/$CRYPTUUID"
+
+HDDUUID="8ede4b72-d3e2-43a0-b707-58a16110766f"
+HDDDEVICE="/dev/disk/by-uuid/$HDDUUID"
+
+SSDUUID="4b98f446-c5df-46f9-8861-282b40f2dceb"
+SSDDEVICE="/dev/disk/by-uuid/$SSDUUID"
+
+setup() {
+  if [ ! -e $CRYPTDEVICE ]
     then
       echo "No Keyfiles found -- exiting"
       exit 1
   fi
 
-  cryptsetup open /dev/mmcblk0p1 keys
+  cryptsetup open $CRYPTDEVICE keys
 
   if [ ! -e /keys ]
     then
       mkdir /keys
   fi
   mount /dev/mapper/keys /keys
-  cryptsetup open -d /keys/keyfile_hdd /dev/sdb3 hdd
-  mount /dev/mapper/hdd /hdd
+}
+
+cleanup() {
   umount /keys
   cryptsetup close keys
   sync
-
-  #linking all the stuff
-  
 }
 
-umnt() {
+mnthdd() {
+  setup
+
+  if [ ! -e /hdd ]
+    then
+      mkdir /hdd
+  fi
+  cryptsetup open -d /keys/keyfile_hdd $HDDDEVICE hdd
+  mount /dev/mapper/hdd /hdd
+
+  cleanup
+}
+
+mntssd() {
+  setup
+
+  if [ ! -e /ssd ]
+    then
+      mkdir /ssd
+  fi
+  cryptsetup open -d /keys/keyfile_system_old_ssd $SSDDEVICE ssd
+  mount /dev/mapper/ssd /ssd
+
+  cleanup
+}
+
+
+
+umnthdd() {
   umount /hdd
   cryptsetup close hdd
+}
+
+umntssd() {
+  umount /ssd
+  cryptsetup close ssd
 }
 
 
@@ -38,10 +78,22 @@ fi
 
 if [ "$1" = "mount" ]
   then
-    mnt
+    if [ "$2" = "ssd" ]
+      then
+        mntssd
+    elif [ "$2" = "hdd" ]
+      then
+        mnthdd
+    fi
 elif [ "$1" = "umount" ]
   then
-    umnt
+    if [ "$2" = "ssd" ]
+      then
+        umntssd
+    elif [ "$2" = "hdd" ]
+      then
+        umnthdd
+    fi
 else
     echo "Wrong command -- only accept ['mount', 'umount']"
 fi
