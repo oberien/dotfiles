@@ -99,41 +99,65 @@ bindsym $mod+a focus parent
 # focus the child container
 #bindsym $mod+d focus child
 
+# define workspace names
+set $w1 1: web
+set $w2 2: mail
+set $w3 3: skype
+set $w4 4: xmpp
+set $w5 5: p+m
+set $w6 6: ff
+set $w7 7: steam
+set $w8 8
+set $w9 9
+set $w10 10
+set $w11 11
+set $w12 12
+set $w13 13
+set $w14 14
+set $w15 15
+set $w16 16
+
 # switch to workspace
-bindsym $mod+1 workspace 1: web
-bindsym $mod+2 workspace 2: mail
-bindsym $mod+3 workspace 3: skype
-bindsym $mod+4 workspace 4: xmpp
-bindsym $mod+5 workspace 5: p+m
-bindsym $mod+6 workspace 6
-bindsym $mod+7 workspace 7
-bindsym $mod+8 workspace 8
-bindsym $mod+9 workspace 9
-bindsym $mod+0 workspace 10
-bindsym $mod+F1 workspace F1
-bindsym $mod+F2 workspace F2
-bindsym $mod+F3 workspace F3
-bindsym $mod+F4 workspace F4
-bindsym $mod+F5 workspace F5
-bindsym $mod+F6 workspace F6
+bindsym $mod+1 workspace $w1
+workspace "$w1" output DP-2
+bindsym $mod+2 workspace $w2
+workspace "$w2" output DVI-I-1
+bindsym $mod+3 workspace $w3
+bindsym $mod+4 workspace $w4
+workspace "$w4" output HDMI-1
+bindsym $mod+5 workspace $w5
+workspace "$w5" output HDMI-1
+bindsym $mod+6 workspace $w6
+workspace "$w6" output DVI-I-1
+bindsym $mod+7 workspace $w7
+workspace "$w7" output DP-2
+bindsym $mod+8 workspace $w8
+bindsym $mod+9 workspace $w9
+bindsym $mod+0 workspace $w10
+bindsym $mod+F1 workspace $w11
+bindsym $mod+F2 workspace $w12
+bindsym $mod+F3 workspace $w13
+bindsym $mod+F4 workspace $w14
+bindsym $mod+F5 workspace $w15
+bindsym $mod+F6 workspace $w16
 
 # move focused container to workspace
-bindsym $mod+Shift+1 move container to workspace 1: web
-bindsym $mod+Shift+2 move container to workspace 2: mail
-bindsym $mod+Shift+3 move container to workspace 3: skype
-bindsym $mod+Shift+4 move container to workspace 4: xmpp
-bindsym $mod+Shift+5 move container to workspace 5: p+m
-bindsym $mod+Shift+6 move container to workspace 6
-bindsym $mod+Shift+7 move container to workspace 7
-bindsym $mod+Shift+8 move container to workspace 8
-bindsym $mod+Shift+9 move container to workspace 9
-bindsym $mod+Shift+0 move container to workspace 10
-bindsym $mod+Shift+F1 move container to workspace F1
-bindsym $mod+Shift+F2 move container to workspace F2
-bindsym $mod+Shift+F3 move container to workspace F3
-bindsym $mod+Shift+F4 move container to workspace F4
-bindsym $mod+Shift+F5 move container to workspace F5
-bindsym $mod+Shift+F6 move container to workspace F6
+bindsym $mod+Shift+1 move container to workspace $w1
+bindsym $mod+Shift+2 move container to workspace $w2
+bindsym $mod+Shift+3 move container to workspace $w3
+bindsym $mod+Shift+4 move container to workspace $w4
+bindsym $mod+Shift+5 move container to workspace $w5
+bindsym $mod+Shift+6 move container to workspace $w6
+bindsym $mod+Shift+7 move container to workspace $w7
+bindsym $mod+Shift+8 move container to workspace $w8
+bindsym $mod+Shift+9 move container to workspace $w9
+bindsym $mod+Shift+0 move container to workspace $w10
+bindsym $mod+Shift+F1 move container to workspace $w11
+bindsym $mod+Shift+F2 move container to workspace $w12
+bindsym $mod+Shift+F3 move container to workspace $w13
+bindsym $mod+Shift+F4 move container to workspace $w14
+bindsym $mod+Shift+F5 move container to workspace $w15
+bindsym $mod+Shift+F6 move container to workspace $w16
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -168,6 +192,26 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+# startup programs and bind to workspaces
+exec --no-startup-id i3-msg "workspace $w1; exec vivaldi"
+assign [class="vivaldi-preview"] → $w1
+exec --no-startup-id i3-msg "workspac $w2; exec thunderbird"
+assign [class="Thunderbird"] → $w2
+exec --no-startup-id i3-msg "workspace $w4; exec pidgin"
+assign [class="Pidgin"] → $w4
+exec --no-startup-id i3-msg "workspace $w5; exec pavucontrol"
+exec --no-startup-id i3-msg "workspace $w5; exec mumble"
+assign [class="Pavucontrol"] → $w5
+assign [class="Mumble"] → $w5
+exec --no-startup-id i3-msg "workspace $w6; exec firefox"
+assign [class="Firefox"] → $w6
+exec --no-startup-id i3-msg "workspace $w7; exec steam"
+assign [class="Steam"] → $w7
+
+exec nm-applet
+
+# custom bindings
+
 bindsym --release Print exec --no-startup-id import /tmp/screenshot.png
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id /usr/bin/pulseaudio-ctl up 1
@@ -186,11 +230,9 @@ bindsym $mod+F12 exec --no-startup-id setxkbmap de neo
 
 bindcode --release 120 exec --no-startup-id xset dpms force standby
 
-# Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available)
 bar {
         #status_command i3status
+        # use custom wrapper script
         status_command python ~/.i3/bar.py
 }
 
-exec nm-applet
