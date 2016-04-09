@@ -49,6 +49,11 @@ alias umount='sudo umount'
 alias updatedb='sudo updatedb'
 alias fucking='sudo'
 
+__bindifffn() {
+  cmp -l $1 $2 | gawk '{printf "%08X %02X %02X\n", $1, strtonum(0$2), strtonum(0$3)}'
+}
+alias bindiff=__bindifffn
+
 # vlc rc
 alias rclist='echo -n "playlist\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"'
 __rcgotofn() {
