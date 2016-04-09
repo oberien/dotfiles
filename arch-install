@@ -153,6 +153,7 @@ yaourt -S livestreamer
 pacman -S mumble
 pacman -S pulseaudio
 pacman -S pavucontrol
+yaourt -S pulseaudio-ctl
 pacman -S thunderbird
 yaourt -S skype
 pacman -S pidgin pidgin-otr
