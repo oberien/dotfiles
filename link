@@ -26,6 +26,5 @@ mkdir ~/.vim/
 mkdir ~/.vim/bundle/
 git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
-sh ~/.vim/bundle/youcompleteme/install.sh
 
-
+sh ~/.vim/bundle/youcompleteme/install.sh --clang-completer --omnisharp-completer --racer-completer --system-libclang --tern-completer

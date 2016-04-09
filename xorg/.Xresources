@@ -15,17 +15,17 @@ URxvt.foreground: White
 !pixelsize=15:antialias=true:hinting=true
 urxvt*skipBuiltinGlyphs: true
 
-urxvt*font: xft:DejaVu Sans Mono:style=Book:antialias=false:size=10, \
+urxvt*font: xft:DejaVu Sans Mono for Powerline-10:style=Book:antialias=false:size=10, \
             xft:WenQuanYi Bitmap Song:size=10, \
             xft:FreeSerif:style=Regular, \
             xft:unifont:style=Medium:antialias=false, \
             xft:Symbola
 
-urxvt*boldFont: xft:DejaVu Sans Mono:style=Book:antialias=false:size=10, \
+urxvt*boldFont: xft:DejaVu Sans Mono for Powerline-10:style=Book:antialias=false:size=10, \
                 xft:WenQuanYi Bitmap Song:size=10, \
                 xft:unifont:style=Medium:antialias=false
 
-urxvt*italicFont: xft:DejaVu Sans Mono:style=Book:antialias=false:size=10, \
+urxvt*italicFont: xft:DejaVu Sans Mono for Powerline-10:style=Book:antialias=false:size=10, \
                   xft:WenQuanYi Bitmap Song:size=10, \
                   xft:unifont:style=Medium:antialias=false
 
