@@ -15,7 +15,7 @@ Bundle 'vim-airline/vim-airline'
 " airline colorthemes
 Bundle 'vim-airline/vim-airline-themes'
 " Colortheme
-Bundle 'Blackhole16/harlequin'
+Bundle 'oberien/harlequin'
 " Sourround your code
 Bundle 'tpope/vim-surround'
 " Editor Config
