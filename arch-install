@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# partition variables
+$BOOTPARTITION=/dev/device1
+$SWAPPARTITION=/dev/device2
+$SYSTEMPARTITION=/dev/device3
+$SWAP=/dev/mapper/swap
+$SYSTEM=/dev/mapper/system
+
 loadkeys de-latin1
 setfont lat9w-16
 
@@ -29,25 +36,34 @@ fdisk /dev/device
         +256G
     w
 
-# crypto
-cryptsetup -vd keyfile luksFormat /dev/device3
-cryptsetup open -d keyfile /dev/device3 system
+# crypto system
+# If no keyfile is wanted, leave out -d keyfile.
+cryptsetup -vd keyfile_system luksFormat $SYSTEMPARTITION
+cryptsetup open -d keyfile_system $SYSTEMPARTITION system
+# crypto swap
+# If swap should not be encrypted, leave out this step.
+# If no keyfile is wanted, leave out -d keyfile. UNTESTED
+cryptsetup -vd keyfile_swap luksFormat $SWAPPARTITION
+cryptsetup open -d keyfile_swap $SWAPPARTITION swap
+
 
 # format
-mkfs.ext4 /dev/mapper/system
-mkfs.fat -F32 /dev/device1
+mkfs.ext4 $SYSTEM
+mkfs.fat -F32 $BOOTPARTITION
 # swap
-mkswap /dev/device2
-swapon /dev/device2
+# If swap was set up without cryptsetup, use $SWAPPARTITION instead of $SWAP.
+mkswap $SWAP
+swapon $SWAP
 
 # mount everything
-mount /dev/mapper/system /mnt
-mount /dev/device
+mount $SYSTEM /mnt
 mkdir /mnt/boot
-mount /dev/device1 /mnt/boot
+mount $BOOTPARTITION /mnt/boot
 
 
 # pacstrap
+# For a setup with wayland and swey use this instead UNTESTED
+# pacstrap -i /mnt base base-devel git net-tools networkmanager wayland sway gnome-terminal cmake
 pacstrap -i /mnt base base-devel zsh git net-tools networkmanager xorg-xserver xorg-xinit xorg-utils xorg-server-utils rxvt-unicode i3 dmenu autocutsel gvim cmake
 genfstab -U /mnt > /mnt/etc/fstab
 cat /mnt/etc/fstab
@@ -55,9 +71,9 @@ cat /mnt/etc/fstab
 arch-chroot /mnt /bin/zsh
 
 # locale
-nano /etc/locale.gen # uncomment en_US.UTF-8 UTF-8
+nano /etc/locale.gen # uncomment en_US.UTF-8 UTF-8 or the language of your choice
 locale-gen
-echo LANG=en_US.UTF-8 > /etc/locale.conf
+echo LANG=en_US.UTF-8 > /etc/locale.conf # use the uncommented language here
 echo -e "KEYMAP=de-latin1\nFONT=lat9w-16" > /etc/vconsole.conf
 ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 hwclock --systohc --utc
@@ -73,27 +89,30 @@ bootctl update
 # create user
 useradd NAME -m -g users -G wheel -s /bin/zsh 
 nano /etc/sudoers # uncomment %wheel
+# Using the group sudo may work as well (@main--), but I only had success with wheel.
 
 # dotfiles 'n stuff
   # change user to created one
   # setup dotfiles
-  # setup paranoid_link
+  # setup paranoid_link if needed
   # edit files for paranoid stuff
+
+# generate bootimage and entries
 mkinitcpio -p linux
 cat <<_EOF_ > /boot/loader/entries/arch.conf
 title       Arch Linux
 linux       /vmlinuz-linux
 initrd      /initramfs-linux.img
-options     cryptdevice=/dev/sda3:system root=/dev/mapper/system
+options     cryptdevice=$SYSTEMPARTITION:system root=$SYSTEM
 _EOF_
 
-nano /boot/loader/entries/arch.conf # adapt /dev/sdXX
-
+# If multiple entries exist, timeout should be non-zero
 cat <<_EOF_ > /boot/loader/loader.conf
 default arch
 timeout 0
 _EOF_
 
+# important packets
 pacman -S python3
 pacman -S python2
 pacman -S arandr
@@ -117,7 +136,7 @@ makepkg -si
 cd ..
 rm -r yaourt yaourt.tar.gz
 
-# drivers
+# amd graphics drivers
 yaourt -S catalyst
 yaourt -S lib32-catalyst-utils
 
@@ -127,7 +146,7 @@ pacman -S opera
 pacman -S firefox
 pacman -S gst-libav
 
-# important others
+# useful others
 pacman -S evince
 pacman -S feh
 pacman -S imagemagick
