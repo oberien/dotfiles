@@ -64,6 +64,10 @@ mount $BOOTPARTITION /mnt/boot
 # pacstrap
 # For a setup with wayland and swey use this instead UNTESTED
 # pacstrap -i /mnt base base-devel git net-tools networkmanager wayland sway gnome-terminal cmake
+# For a setup with gnome and wayland (wayland is default for gnome).
+# Using gnome you need to have `exec gnome-session` in you .xinitrc.
+# Additionally if you want to use gdm, run `systemctl enable gdm.service` in the new system
+# pacstrap -i /mnt base base-devel zsh git net-tools networkmanager network-manager-applet gvim cmake gnome gnome-extra
 pacstrap -i /mnt base base-devel zsh git net-tools networkmanager xorg-xserver xorg-xinit xorg-utils xorg-server-utils rxvt-unicode i3 dmenu autocutsel gvim cmake
 genfstab -U /mnt > /mnt/etc/fstab
 cat /mnt/etc/fstab
