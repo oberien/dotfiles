@@ -72,6 +72,10 @@ Plugin 'racer-rust/vim-racer'
 Bundle 'OmniSharp/omnisharp-vim'
 " C# Syntax Highlighting
 "Bundle 'OrangeT/vim-csharp'
+" pandoc syntax support
+Bundle 'vim-pandoc/vim-pandoc-syntax'
+" pandoc utilities
+Bundle 'vim-pandoc/vim-pandoc'
 
 " finish up Vundle
 call vundle#end()
