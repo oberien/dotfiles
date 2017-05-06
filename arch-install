@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # partition variables
-$BOOTPARTITION=/dev/device1
-$SWAPPARTITION=/dev/device2
-$SYSTEMPARTITION=/dev/device3
-$SWAP=/dev/mapper/swap
-$SYSTEM=/dev/mapper/system
+BOOTPARTITION=/dev/device1
+SWAPPARTITION=/dev/device2
+SYSTEMPARTITION=/dev/device3
+SWAP=/dev/mapper/swap
+SYSTEM=/dev/mapper/system
 
 loadkeys de-latin1
 setfont lat9w-16
