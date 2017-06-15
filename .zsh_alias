@@ -42,7 +42,6 @@ alias -s sh=vim
 alias dh=' dirs -v'
 
 alias pacman='sudo pacman'
-alias systemctl='sudo systemctl'
 alias oclhashcat='sudo oclHashcat'
 alias mount='sudo mount'
 alias umount='sudo umount'
@@ -56,7 +55,21 @@ alias bindiff=__bindifffn
 
 # vlc rc
 alias rclist='echo -n "playlist\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"'
+__rcsearchfn() {
+  echo -n "search $@\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"
+}
+alias rcsearch=__rcsearchfn
 __rcgotofn() {
+  if ! [[ "$*" =~ '^[0-9]+$' ]]; then
+    list=`rcsearch $@`
+    lines=`echo $list | wc -l`
+    if [ ! $lines = 1 ]; then
+      echo "Didn't get a single result:"
+      echo $list
+      return
+    fi
+    1=`echo $list | awk -F " " '{print $1}'`
+  fi
   echo "goto $1" | ncat ::1 20000 > /dev/null
 }
 alias rcgoto=__rcgotofn
