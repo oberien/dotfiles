@@ -321,5 +321,5 @@ precmd () {
 PROMPT="%B%{$fg[green]%}%n%{$fg[cyan]%}@%{$fg[blue]%}%m%b %{$fg[red]%}%~ %{$fg[yellow]%}%1v%2v%{$reset_color%}%# "
 RPROMPT="%3v%4v%{$reset_color%}[%{$fg[yellow]%}%?%{$reset_color%}]%1v%{$fg[blue]%}:%{$fg[red]%}%l%{$reset_color%} "
 
-source /usr/share/nvm/init-nvm.sh
-nvm use stable
+#source /usr/share/nvm/init-nvm.sh
+#nvm use stable
