@@ -57,6 +57,7 @@ alias bindiff=__bindifffn
 alias rclist='echo -n "playlist\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"'
 __rcsearchfn() {
   echo -n "search $@\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"
+  echo -n "search\nquit" | ncat ::1 20000 > /dev/null
 }
 alias rcsearch=__rcsearchfn
 __rcgotofn() {
