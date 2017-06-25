@@ -140,6 +140,11 @@ makepkg -si
 cd ..
 rm -r yaourt yaourt.tar.gz
 
+# setup neo-layout
+yaourt -S kbd-neo
+localectl set-keymap --no-convert de neo
+localectl set-x11-keymap --no-convert de neo
+
 # amd graphics drivers
 yaourt -S catalyst
 yaourt -S lib32-catalyst-utils
