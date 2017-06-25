@@ -25,7 +25,6 @@ alias lz='ll -rS'                   # sort by size
 alias lt='ll -rt'                   # sort by date
 alias lrandom="ls | sort -R | head -n 1"
 
-alias rm='rm -I'
 #alias chown='chown --preserve-root'
 #alias chmod='chmod --preserve-root'
 #alias chgrp='chgrp --preserve-root'
@@ -57,7 +56,6 @@ alias bindiff=__bindifffn
 alias rclist='echo -n "playlist\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"'
 __rcsearchfn() {
   echo -n "search $@\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"
-  echo -n "search\nquit" | ncat ::1 20000 > /dev/null
 }
 alias rcsearch=__rcsearchfn
 __rcgotofn() {
@@ -76,3 +74,8 @@ __rcgotofn() {
 alias rcgoto=__rcgotofn
 alias rcstatus='echo -n "status\nquit" | ncat ::1 20000 | grep -E "> \( |\( " | sed -E "s/> //" | sed -E "s/\( (.*) \)/\1/"'
 alias rcinfo='echo -n "info\nquit" | ncat ::1 20000 | grep -E "\|" | sed -E "s/\| //" | sed -E "/^\|[^ ]/d"'
+__rcgrepfn() {
+  rcsearchfn $@
+  echo -n "search\nquit" | ncat ::1 20000
+}
+alias rcgrep=__rcgrepfn
