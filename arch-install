@@ -126,19 +126,17 @@ pacman -S wget
 pacman -S openssh
 pacman -S openvpn
 
-# yaourt
-curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/package-query.tar.gz
-tar -xvzf package-query.tar.gz
-cd package-query
-makepkg -si
-cd ..
-rm -r package-query package-query.tar.gz
-curl -O https://aur.archlinux.org/cgit/aur.git/snapshot/yaourt.tar.gz
-tar -xvzf yaourt.tar.gz
-cd yaourt
-makepkg -si
-cd ..
-rm -r yaourt yaourt.tar.gz
+# pacaur instead of yaourt, because it's secure™
+# https://gist.github.com/Tadly/0e65d30f279a34c33e9b
+mkdir -p /tmp/pacaur_install
+cd /tmp/pacaur_install
+sudo pacman -S expac yajl git --noconfirm --needed
+curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower"
+makepkg PKGBUILD --skippgpcheck --install --needed
+curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur"
+makepkg PKGBUILD --install --needed
+cd ~
+rm -r /tmp/pacaur_install
 
 # setup neo-layout
 yaourt -S kbd-neo
