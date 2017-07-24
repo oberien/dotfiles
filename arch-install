@@ -141,7 +141,7 @@ rm -r /tmp/pacaur_install
 # setup neo-layout
 pacaur -S kbd-neo
 localectl set-keymap --no-convert de neo
-localectl set-x11-keymap --no-convert de neo
+localectl set-x11-keymap --no-convert de thinkpad neo
 
 # notification daemon
 pacman -S dunst
