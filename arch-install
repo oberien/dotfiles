@@ -126,7 +126,7 @@ pacman -S wget
 pacman -S openssh
 pacman -S openvpn
 
-# pacaur instead of yaourt, because it's secure™
+# pacaur instead of pacaur, because it's secure™
 # https://gist.github.com/Tadly/0e65d30f279a34c33e9b
 mkdir -p /tmp/pacaur_install
 cd /tmp/pacaur_install
@@ -139,7 +139,7 @@ cd ~
 rm -r /tmp/pacaur_install
 
 # setup neo-layout
-yaourt -S kbd-neo
+pacaur -S kbd-neo
 localectl set-keymap --no-convert de neo
 localectl set-x11-keymap --no-convert de neo
 
@@ -147,7 +147,7 @@ localectl set-x11-keymap --no-convert de neo
 pacman -S dunst
 
 # browser
-yaourt -S vivaldi
+pacaur -S vivaldi
 pacman -S opera
 pacman -S firefox
 pacman -S gst-libav
@@ -174,36 +174,36 @@ pacman -S dnsutils
 # others
 pacman -S ffmpeg
 pacman -S vlc
-yaourt -S livestreamer
+pacaur -S livestreamer
 pacman -S mumble
 pacman -S pulseaudio
 pacman -S pavucontrol
-yaourt -S pulseaudio-ctl
+pacaur -S pulseaudio-ctl
 pacman -S thunderbird
-yaourt -S skype
+pacaur -S skype
 pacman -S pidgin pidgin-otr
 
 
 # steam
 # enable multilib in /etc/pacman.conf
 pacman -Syu
-yaourt -S steam
+pacaur -S steam
 
 # other fonts used for games/wine/vim
-yaourt -S ttf-tahoma
-yaourt -S ttf-ms-fonts
-yaourt -S ttf-dejavu-sans-mono-powerline-git
+pacaur -S ttf-tahoma
+pacaur -S ttf-ms-fonts
+pacaur -S ttf-dejavu-sans-mono-powerline-git
 
 # java
 pacman -S jdk8-openjdk
 pacman -S openjdk8-src
 pacman -S openjdk8-doc
-yaourt -S intellij-idea-ultimate-edition
+pacaur -S intellij-idea-ultimate-edition
 
 # rust
-yaourt -S rust-nightly-bin
-yaourt -S rust-racer-git
-yaourt -S rust-src
+pacaur -S rust-nightly-bin
+pacaur -S rust-racer-git
+pacaur -S rust-src
 
 # maybe
 pacman -S gparted
