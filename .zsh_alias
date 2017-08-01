@@ -58,9 +58,16 @@ __rcsearchfn() {
   echo -n "search $@\nquit" | ncat ::1 20000 | grep -E "\|   " | sed -E "s/\|   (.*)/\1/"
 }
 alias rcsearch=__rcsearchfn
+
+__rcgrepfn() {
+  rcsearch $@
+  echo -n "search\nquit" | ncat ::1 20000 > /dev/null
+}
+alias rcgrep=__rcgrepfn
+
 __rcgotofn() {
   if ! [[ "$*" =~ '^[0-9]+$' ]]; then
-    list=`rcsearch $@`
+    list=`rcgrep $@`
     lines=`echo $list | wc -l`
     if [ ! $lines = 1 ]; then
       echo "Didn't get a single result:"
@@ -72,10 +79,6 @@ __rcgotofn() {
   echo "goto $1" | ncat ::1 20000 > /dev/null
 }
 alias rcgoto=__rcgotofn
+
 alias rcstatus='echo -n "status\nquit" | ncat ::1 20000 | grep -E "> \( |\( " | sed -E "s/> //" | sed -E "s/\( (.*) \)/\1/"'
 alias rcinfo='echo -n "info\nquit" | ncat ::1 20000 | grep -E "\|" | sed -E "s/\| //" | sed -E "/^\|[^ ]/d"'
-__rcgrepfn() {
-  rcsearchfn $@
-  echo -n "search\nquit" | ncat ::1 20000
-}
-alias rcgrep=__rcgrepfn
