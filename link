@@ -27,4 +27,8 @@ mkdir ~/.vim/bundle/
 git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
 
+# dunst
+mkdir ~/.config/dunst
+ln -s ~/dotfiles/dunstrc ~/.config/dunst/dunstrc
+
 sh ~/.vim/bundle/youcompleteme/install.sh --clang-completer --omnisharp-completer --racer-completer --system-libclang --tern-completer
