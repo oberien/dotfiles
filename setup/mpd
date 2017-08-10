@@ -1,0 +1,5 @@
+#!/bin/sh
+
+mkdir .config/mpd/
+mkdir .config/mpd/playlists
+ln -s ~/dotfiles/mpd/mpd.conf ~/.config/mpd.conf

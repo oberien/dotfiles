@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ln -s ~/dotfiles/xorg/.xinitrc ~/.xinitrc
+ln -s ~/dotfiles/xorg/.Xresources ~/.Xresources
+ln -s ~/dotfiles/xorg/10-monitor.conf /etc/X11/xorg.conf.d/10-monitor.conf

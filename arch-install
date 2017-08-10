@@ -148,7 +148,6 @@ pacman -S dunst
 
 # browser
 pacaur -S vivaldi
-pacman -S opera
 pacman -S firefox
 pacman -S gst-libav
 
@@ -165,24 +164,26 @@ pacman -S pm-utils
 pacman -S tree
 pacman -S dosfstools
 pacman -S ntfs-3g
-pacman -S mariadb
-# init mysql
-sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-mysql_secure_installation
-pacman -S dnsutils
+
+# media
+pacman -S mpd
+pacman -S mpc
+pacman -S mpv
 
 # others
 pacman -S ffmpeg
-pacman -S vlc
-pacaur -S livestreamer
 pacman -S mumble
 pacman -S pulseaudio
 pacman -S pavucontrol
 pacaur -S pulseaudio-ctl
 pacman -S thunderbird
-pacaur -S skype
 pacman -S pidgin pidgin-otr
 
+# mysql
+pacman -S mariadb
+sudo mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+mysql_secure_installation
+pacman -S dnsutils
 
 # steam
 # enable multilib in /etc/pacman.conf
@@ -201,9 +202,7 @@ pacman -S openjdk8-doc
 pacaur -S intellij-idea-ultimate-edition
 
 # rust
-pacaur -S rust-nightly-bin
-pacaur -S rust-racer-git
-pacaur -S rust-src
+pacman -S rustup
 
 # maybe
 pacman -S gparted

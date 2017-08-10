@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ln -s ~/dotfiles/sysctl/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf

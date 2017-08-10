@@ -1,34 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
-# setup zsh
-ln -s ~/dotfiles/.zshrc ~/.zshrc
-ln -s ~/dotfiles/.zsh_alias ~/.zsh_alias
-
-# setup i3
-mkdir ~/.i3
-ln -s ~/dotfiles/.i3/config ~/.i3/config
-ln -s ~/dotfiles/.i3/bar.py ~/.i3/bar.py
-ln -s ~/dotfiles/.i3status.conf ~/.i3status.conf
-mkdir ~/.i3/log
-
-# setup xorg
-ln -s ~/dotfiles/xorg/.xinitrc ~/.xinitrc
-ln -s ~/dotfiles/xorg/.Xresources ~/.Xresources
-ln -s ~/dotfiles/xorg/10-monitor.conf /etc/X11/xorg.conf.d/10-monitor.conf
-
-# enable REISUB
-ln -s ~/dotfiles/sysctl/99-sysctl.conf /etc/sysctl.d/99-sysctl.conf
-
-# setup vim
-ln -s ~/dotfiles/.vimrc ~/.vimrc
-ln -s ~/dotfiles/.ideavimrc ~/.ideavimrc
-mkdir ~/.vim/
-mkdir ~/.vim/bundle/
-git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-vim +PluginInstall +qall
-
-# dunst
-mkdir ~/.config/dunst
-ln -s ~/dotfiles/dunstrc ~/.config/dunst/dunstrc
-
-sh ~/.vim/bundle/youcompleteme/install.sh --clang-completer --omnisharp-completer --racer-completer --system-libclang --tern-completer
+./setup/zsh
+./setup/i3
+./setup/xorg
+sudo ./setup/reisub
+./setup/dunst
+./setup/vim
+./setup/mpd

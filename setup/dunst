@@ -1,0 +1,4 @@
+#!/bin/sh
+
+mkdir ~/.config/dunst
+ln -s ~/dotfiles/dunstrc ~/.config/dunst/dunstrc
