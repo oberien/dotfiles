@@ -1,7 +1,7 @@
 #!/bin/sh
 
 mkdir ~/.i3
-ln -s ~/dotfiles/.i3/config ~/.i3/config
-ln -s ~/dotfiles/.i3/bar.py ~/.i3/bar.py
+ln -s ~/dotfiles/i3/config ~/.i3/config
+ln -s ~/dotfiles/i3/bar/ ~/.i3/bar
 ln -s ~/dotfiles/.i3status.conf ~/.i3status.conf
 mkdir ~/.i3/log

@@ -1,0 +1,16 @@
+[package]
+name = "bar"
+version = "0.1.0"
+authors = ["oberien <jaro.fietz@gmx.de>"]
+
+[dependencies]
+tokio-core = "0.1"
+tokio-proto = "0.1"
+tokio-io = "0.1"
+tokio-process = "0.1"
+serde = "1.0"
+serde_derive = "1.0"
+serde_json = "1.0"
+bytes = "0.4"
+futures = "0.1"
+chrono = "0.4"
