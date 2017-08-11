@@ -7,7 +7,6 @@ use futures::{Future, Stream};
 use tokio_core::reactor::Handle;
 use tokio_process::CommandExt;
 use tokio_io::io;
-use chrono::{Utc, Timelike, TimeZone};
 
 use controller::Controller;
 use self::codec::{Codec, Element};
@@ -48,7 +47,7 @@ pub fn i3status(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Fut
                     },
                     "cpu_usage" => controller.set_cpu_usage(cpu_usage(e)),
                     "load" => controller.set_load(load(e)),
-                    "time" => controller.set_datetime(time(e)),
+                    "time" => (),
                     _ => unknown.push(e)
                 }
             }
@@ -120,14 +119,3 @@ fn load(mut e: Element) -> Element {
     e
 }
 
-fn time(mut e: Element) -> Element {
-    let datetime = Utc.datetime_from_str(&e.full_text, "%H:%M %m/%d/%Y").unwrap();
-    let offset = (datetime.hour() % 12) * 2 + (datetime.minute() + 15) / 30;
-    let clock = icon::CLOCKS[offset as usize];
-    let offset = (datetime.hour() + 2) / 6;
-    let sun = icon::CYCLE[offset as usize];
-    let time = datetime.format("%H:%M");
-    let date = datetime.format("%m/%d/%Y");
-    e.full_text = format!("{} {} {} {} {}", clock, time, sun, icon::CALENDAR, date);
-    e
-}

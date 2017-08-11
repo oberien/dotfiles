@@ -14,6 +14,7 @@ extern crate sysinfo;
 mod controller;
 mod i3status;
 mod systeminfo;
+mod time;
 mod icon;
 
 use std::cell::RefCell;
@@ -29,11 +30,12 @@ fn main() {
 
     let controller = Rc::new(RefCell::new(Controller::new()));
     let i3status = i3status::i3status(controller.clone(), &core.handle());
-    let sysinfo = systeminfo::systeminfo(controller);
+    let sysinfo = systeminfo::systeminfo(controller.clone());
+    let time = time::time(controller.clone());
     // TODO: brightness
     // TODO: media
     // TODO: moon phase
-    let joined = future::join_all(vec![i3status, sysinfo]);
+    let joined = future::join_all(vec![i3status, sysinfo, time]);
 
     core.run(joined).unwrap();
 }

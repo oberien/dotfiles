@@ -1,8 +1,6 @@
 use std::io;
 
-use tokio_io::codec::{Encoder, Decoder};
 use serde_json as json;
-use bytes::BytesMut;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Element {
@@ -46,38 +44,6 @@ impl Codec {
                 Ok(None)
             }
             State::AwaitingData => json::from_str(line).map_err(|e| e.into()).map(Some)
-        }
-    }
-}
-
-impl Encoder for Codec {
-    type Item = Vec<Element>;
-    type Error = io::Error;
-
-    fn encode(&mut self, item: Vec<Element>, dst: &mut BytesMut) -> Result<(), io::Error> {
-        let s = json::to_string(&item)?;
-        dst.extend(s.bytes());
-        Ok(())
-    }
-}
-
-impl Decoder for Codec {
-    type Item = Vec<Element>;
-    type Error = io::Error;
-
-    fn decode(&mut self, src: &mut BytesMut) -> Result<Option<Vec<Element>>, io::Error> {
-        if let Some(pos) = src.iter().position(|&b| b == b'\n') {
-            let line = src.split_to(pos);
-            // remove \n
-            src.split_to(1);
-            match json::from_slice(&line) {
-                Ok(elements) => {
-                    Ok(Some(elements))
-                }
-                Err(e) => Err(e.into())
-            }
-        } else {
-            return Ok(None)
         }
     }
 }

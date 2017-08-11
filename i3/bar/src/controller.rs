@@ -18,7 +18,8 @@ pub struct Controller {
     load: Option<Element>,
     ram: Option<Element>,
     swap: Option<Element>,
-    datetime: Option<Element>,
+    time: Option<Element>,
+    date: Option<Element>,
     unknown: Vec<Element>,
 }
 
@@ -46,7 +47,8 @@ impl Controller {
             load: None,
             ram: None,
             swap: None,
-            datetime: None,
+            time: None,
+            date: None,
             unknown: Vec::new(),
         }
     }
@@ -74,9 +76,8 @@ impl Controller {
         }
         self.ram.as_ref().map(|e| elements.push(e.clone()));
         self.swap.as_ref().map(|e| elements.push(e.clone()));
-        if let Some(e) = self.datetime.as_ref() {
-            elements.push(e.clone());
-        }
+        self.time.as_ref().map(|e| elements.push(e.clone()));
+        self.date.as_ref().map(|e| elements.push(e.clone()));
         for unknown in &self.unknown {
             elements.push(unknown.clone());
         }
@@ -114,8 +115,12 @@ impl Controller {
         self.swap = Some(swap);
     }
 
-    pub fn set_datetime(&mut self, datetime: Element) {
-        self.datetime = Some(datetime);
+    pub fn set_time(&mut self, time: Element) {
+        self.time = Some(time);
+    }
+
+    pub fn set_date(&mut self, date: Element) {
+        self.date = Some(date);
     }
 
     pub fn set_unknown(&mut self, unknown: Vec<Element>) {
