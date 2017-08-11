@@ -11,6 +11,7 @@ extern crate futures;
 extern crate chrono;
 extern crate sysinfo;
 
+mod codec;
 mod controller;
 mod i3status;
 mod systeminfo;
@@ -26,6 +27,9 @@ use futures::future;
 use controller::Controller;
 
 fn main() {
+    // TODO: Use tokio_file_unix for stdout handling
+    // TODO: Make controller hold all streams and be a stream itself?
+    // TODO: stdin with click event handling
     let mut core = Core::new().unwrap();
 
     let controller = Rc::new(RefCell::new(Controller::new()));

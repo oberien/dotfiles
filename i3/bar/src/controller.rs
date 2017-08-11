@@ -4,23 +4,23 @@ use std::io::{self, Write};
 
 use serde_json as json;
 
-use i3status::codec::Element;
+use codec::{Block, BlockBuilder};
 
 pub struct Controller {
     stdout: Sender<String>,
 
-    error: Option<Element>,
+    error: Option<Block>,
 
-    disk_info: Option<Element>,
-    networks: Vec<Element>,
-    battery: Option<Element>,
-    cpu_usage: Option<Element>,
-    load: Option<Element>,
-    ram: Option<Element>,
-    swap: Option<Element>,
-    time: Option<Element>,
-    date: Option<Element>,
-    unknown: Vec<Element>,
+    disk_info: Option<Block>,
+    networks: Vec<Block>,
+    battery: Option<Block>,
+    cpu_usage: Option<Block>,
+    load: Option<Block>,
+    ram: Option<Block>,
+    swap: Option<Block>,
+    time: Option<Block>,
+    date: Option<Block>,
+    unknown: Vec<Block>,
 }
 
 impl Controller {
@@ -87,43 +87,43 @@ impl Controller {
         self.stdout.send(line).unwrap()
     }
 
-    pub fn set_disk_info(&mut self, disk_info: Element) {
+    pub fn set_disk_info(&mut self, disk_info: Block) {
         self.disk_info = Some(disk_info);
     }
 
-    pub fn set_networks(&mut self, networks: Vec<Element>) {
+    pub fn set_networks(&mut self, networks: Vec<Block>) {
         self.networks = networks;
     }
 
-    pub fn set_battery(&mut self, battery: Element) {
+    pub fn set_battery(&mut self, battery: Block) {
         self.battery = Some(battery);
     }
 
-    pub fn set_cpu_usage(&mut self, cpu_usage: Element) {
+    pub fn set_cpu_usage(&mut self, cpu_usage: Block) {
         self.cpu_usage = Some(cpu_usage);
     }
 
-    pub fn set_load(&mut self, load: Element) {
+    pub fn set_load(&mut self, load: Block) {
         self.load = Some(load);
     }
 
-    pub fn set_ram(&mut self, ram: Element) {
+    pub fn set_ram(&mut self, ram: Block) {
         self.ram = Some(ram);
     }
 
-    pub fn set_swap(&mut self, swap: Element) {
+    pub fn set_swap(&mut self, swap: Block) {
         self.swap = Some(swap);
     }
 
-    pub fn set_time(&mut self, time: Element) {
+    pub fn set_time(&mut self, time: Block) {
         self.time = Some(time);
     }
 
-    pub fn set_date(&mut self, date: Element) {
+    pub fn set_date(&mut self, date: Block) {
         self.date = Some(date);
     }
 
-    pub fn set_unknown(&mut self, unknown: Vec<Element>) {
+    pub fn set_unknown(&mut self, unknown: Vec<Block>) {
         self.unknown = unknown;
     }
 
@@ -133,12 +133,9 @@ impl Controller {
             err.full_text.push_str(&error);
             return;
         }
-        self.error = Some(Element {
-            name: "error".to_string(),
-            instance: None,
-            markup: "none".to_string(),
-            full_text: error,
-            color: Some("#FF0000".to_string()),
-        });
+        self.error = Some(BlockBuilder::new(error)
+            .name("error".to_string())
+            .color("#FF0000".to_string())
+            .build());
     }
 }

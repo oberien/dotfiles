@@ -9,10 +9,8 @@ use tokio_process::CommandExt;
 use tokio_io::io;
 
 use controller::Controller;
-use self::codec::{Codec, Element};
+use codec::{Codec, Block};
 use icon;
-
-pub mod codec;
 
 pub fn i3status(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Future<Item=(), Error=Error>> {
     let codec = Rc::new(RefCell::new(Codec::new()));
@@ -37,7 +35,7 @@ pub fn i3status(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Fut
             let mut unknown = Vec::new();
             for e in vec {
                 let name = e.name.clone();
-                match name.as_str() {
+                match name.unwrap().as_str() {
                     "disk_info" => controller.set_disk_info(disk_info(e)),
                     "ethernet" => networks.push(ethernet(e)),
                     "wireless" => networks.push(wireless(e)),
@@ -60,17 +58,17 @@ pub fn i3status(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Fut
     Box::new(future.join(cmd).map(|_| ()))
 }
 
-fn disk_info(mut e: Element) -> Element {
+fn disk_info(mut e: Block) -> Block {
     e.full_text = format!("{} {}", icon::MINIDISK, e.full_text);
     e
 }
 
-fn ethernet(mut e: Element) -> Element {
+fn ethernet(mut e: Block) -> Block {
     e.full_text = network(&e.full_text, icon::LAN);
     e
 }
 
-fn wireless(mut e: Element) -> Element {
+fn wireless(mut e: Block) -> Block {
     e.full_text = network(&e.full_text, icon::WIFI);
     e
 }
@@ -84,7 +82,7 @@ fn network(full_text: &str, icon: char) -> String {
     s
 }
 
-fn battery(mut e: Element) -> Result<Element, String> {
+fn battery(mut e: Block) -> Result<Block, String> {
     if e.full_text == "No battery" {
         e.full_text = format!("{}{}", icon::BATTERY, icon::STRIKETHROUGH);
         return Ok(e);
@@ -105,12 +103,12 @@ fn battery(mut e: Element) -> Result<Element, String> {
     Ok(e)
 }
 
-fn cpu_usage(mut e: Element) -> Element {
+fn cpu_usage(mut e: Block) -> Block {
     e.full_text = format!("{} {}", icon::PC, e.full_text);
     e
 }
 
-fn load(mut e: Element) -> Element {
+fn load(mut e: Block) -> Block {
     let icon = match e.color.as_ref().map(String::as_ref) {
         Some("#FF0000") => icon::LIGHTNING,
         _ => icon::WARNING,
