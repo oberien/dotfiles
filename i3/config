@@ -233,6 +233,6 @@ bindcode --release 120 exec --no-startup-id xset dpms force standby
 bar {
         #status_command i3status
         # use custom wrapper script
-        status_command python ~/.i3/bar.py
+        status_command cd ~/.i3/bar/ && cargo run
 }
 
