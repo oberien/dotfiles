@@ -32,43 +32,48 @@ pub fn i3status(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Fut
         codec.borrow_mut().decode_line(line)
     });
     let future = elements.for_each(move |opt| {
-        if let Some(mut vec) = opt {
-            for e in &mut vec {
-                let fun = match e.name.as_str() {
-                    "disk_info" => disk_info,
-                    "ethernet" => ethernet,
-                    "wireless" => wireless,
-                    "battery" => battery,
-                    "cpu_usage" => cpu_usage,
-                    "load" => load,
-                    "time" => time,
-                    _ => (|_| Ok(())) as fn(&mut Element) -> Result<(), String> // lel
-                };
-                match fun(e) {
-                    Ok(_) => (),
-                    Err(msg) => controller.borrow_mut().set_error(msg)
+        let mut controller = controller.borrow_mut();
+        if let Some(vec) = opt {
+            let mut networks = Vec::new();
+            let mut unknown = Vec::new();
+            for e in vec {
+                let name = e.name.clone();
+                match name.as_str() {
+                    "disk_info" => controller.set_disk_info(disk_info(e)),
+                    "ethernet" => networks.push(ethernet(e)),
+                    "wireless" => networks.push(wireless(e)),
+                    "battery" => match battery(e) {
+                        Ok(e) => controller.set_battery(e),
+                        Err(e) => controller.push_error(e)
+                    },
+                    "cpu_usage" => controller.set_cpu_usage(cpu_usage(e)),
+                    "load" => controller.set_load(load(e)),
+                    "time" => controller.set_datetime(time(e)),
+                    _ => unknown.push(e)
                 }
             }
-            controller.borrow_mut().set_i3status(vec);
+            controller.set_networks(networks);
+            controller.set_unknown(unknown);
+            controller.update();
         }
         Ok(())
     });
     Box::new(future.join(cmd).map(|_| ()))
 }
 
-fn disk_info(e: &mut Element) -> Result<(), String> {
+fn disk_info(mut e: Element) -> Element {
     e.full_text = format!("{} {}", icon::MINIDISK, e.full_text);
-    Ok(())
+    e
 }
 
-fn ethernet(e: &mut Element) -> Result<(), String> {
+fn ethernet(mut e: Element) -> Element {
     e.full_text = network(&e.full_text, icon::LAN);
-    Ok(())
+    e
 }
 
-fn wireless(e: &mut Element) -> Result<(), String> {
+fn wireless(mut e: Element) -> Element {
     e.full_text = network(&e.full_text, icon::WIFI);
-    Ok(())
+    e
 }
 
 fn network(full_text: &str, icon: char) -> String {
@@ -80,9 +85,10 @@ fn network(full_text: &str, icon: char) -> String {
     s
 }
 
-fn battery(e: &mut Element) -> Result<(), String> {
+fn battery(mut e: Element) -> Result<Element, String> {
     if e.full_text == "No battery" {
         e.full_text = format!("{}{}", icon::BATTERY, icon::STRIKETHROUGH);
+        return Ok(e);
     }
     e.full_text = {
         let mut split = e.full_text.split(' ');
@@ -97,24 +103,24 @@ fn battery(e: &mut Element) -> Result<(), String> {
         };
         format!("{} {} {}", icon, percentage, remaining)
     };
-    Ok(())
+    Ok(e)
 }
 
-fn cpu_usage(e: &mut Element) -> Result<(), String> {
+fn cpu_usage(mut e: Element) -> Element {
     e.full_text = format!("{} {}", icon::PC, e.full_text);
-    Ok(())
+    e
 }
 
-fn load(e: &mut Element) -> Result<(), String> {
+fn load(mut e: Element) -> Element {
     let icon = match e.color.as_ref().map(String::as_ref) {
         Some("#FF0000") => icon::LIGHTNING,
         _ => icon::WARNING,
     };
     e.full_text = format!("{} {}", icon, e.full_text);
-    Ok(())
+    e
 }
 
-fn time(e: &mut Element) -> Result<(), String> {
+fn time(mut e: Element) -> Element {
     let datetime = Utc.datetime_from_str(&e.full_text, "%H:%M %m/%d/%Y").unwrap();
     let offset = (datetime.hour() % 12) * 2 + (datetime.minute() + 15) / 30;
     let clock = icon::CLOCKS[offset as usize];
@@ -123,5 +129,5 @@ fn time(e: &mut Element) -> Result<(), String> {
     let time = datetime.format("%H:%M");
     let date = datetime.format("%m/%d/%Y");
     e.full_text = format!("{} {} {} {} {}", clock, time, sun, icon::CALENDAR, date);
-    Ok(())
+    e
 }
