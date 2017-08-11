@@ -16,6 +16,8 @@ pub struct Controller {
     battery: Option<Element>,
     cpu_usage: Option<Element>,
     load: Option<Element>,
+    ram: Option<Element>,
+    swap: Option<Element>,
     datetime: Option<Element>,
     unknown: Vec<Element>,
 }
@@ -42,6 +44,8 @@ impl Controller {
             battery: None,
             cpu_usage: None,
             load: None,
+            ram: None,
+            swap: None,
             datetime: None,
             unknown: Vec::new(),
         }
@@ -68,6 +72,8 @@ impl Controller {
         if let Some(e) = self.load.as_ref() {
             elements.push(e.clone());
         }
+        self.ram.as_ref().map(|e| elements.push(e.clone()));
+        self.swap.as_ref().map(|e| elements.push(e.clone()));
         if let Some(e) = self.datetime.as_ref() {
             elements.push(e.clone());
         }
@@ -98,6 +104,14 @@ impl Controller {
 
     pub fn set_load(&mut self, load: Element) {
         self.load = Some(load);
+    }
+
+    pub fn set_ram(&mut self, ram: Element) {
+        self.ram = Some(ram);
+    }
+
+    pub fn set_swap(&mut self, swap: Element) {
+        self.swap = Some(swap);
     }
 
     pub fn set_datetime(&mut self, datetime: Element) {
