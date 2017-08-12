@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sed -i 's/^\(state: \).*/\1pause/' ~/.config/mpd/state
