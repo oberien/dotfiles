@@ -99,6 +99,9 @@ bindsym $mod+a focus parent
 # focus the child container
 #bindsym $mod+d focus child
 
+# mouse configuration
+mouse_warping none
+
 # define workspace names
 set $w1 1: web
 set $w2 2: mail
@@ -209,18 +212,19 @@ exec --no-startup-id i3-msg "workspace $w7; exec steam"
 assign [class="Steam"] → $w7
 
 exec nm-applet
+exec dunst
 
 # custom bindings
 
-bindsym --release Print exec --no-startup-id import /tmp/screenshot.png
+bindsym --release Print exec --no-startup-id import "/tmp/screenshot`date +'%Y%m%d%H%M%S'`.png"
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id /usr/bin/pulseaudio-ctl up 1
 bindsym XF86AudioLowerVolume exec --no-startup-id /usr/bin/pulseaudio-ctl down 1
 bindsym XF86AudioMute exec --no-startup-id /usr/bin/pulseaudio-ctl mute
-bindsym XF86AudioPlay exec --no-startup-id bash -c "echo pause > /dev/tcp/localhost/20000"
-bindsym XF86AudioStop exec --no-startup-id bash -c "exec 6<>/dev/tcp/localhost/20000 && echo quit >&6 || vlc ~/Music/ -I rc --rc-host=localhost:20000 --random"
-bindsym XF86AudioPrev exec --no-startup-id bash -c "echo prev > /dev/tcp/localhost/20000"
-bindsym XF86AudioNext exec --no-startup-id bash -c "echo next > /dev/tcp/localhost/20000"
+bindsym XF86AudioPlay exec --no-startup-id mpc toggle
+#bindsym XF86AudioStop exec --no-startup-id mpc
+bindsym XF86AudioPrev exec --no-startup-id mpc prev
+bindsym XF86AudioNext exec --no-startup-id mpc next
 
 
 bindsym XF86Sleep exec --no-startup-id i3lock
