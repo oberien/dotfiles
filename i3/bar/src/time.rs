@@ -17,6 +17,7 @@ pub fn time(controller: Rc<RefCell<Controller>>) -> Box<Future<Item=(), Error=io
         let mut controller = controller.borrow_mut();
         let datetime = Local::now();
         let offset = (datetime.hour() % 12) * 2 + (datetime.minute() + 15) / 30;
+        let offset = offset % 24;
         let clock = icon::CLOCKS[offset as usize];
         let offset = (datetime.hour() + 2) / 6;
         let sun = icon::CYCLE[offset as usize];

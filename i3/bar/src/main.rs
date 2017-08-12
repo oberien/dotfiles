@@ -1,4 +1,4 @@
-extern crate tokio_core;
+#[macro_use] extern crate tokio_core;
 extern crate tokio_io;
 extern crate tokio_proto;
 extern crate tokio_process;
@@ -10,6 +10,7 @@ extern crate bytes;
 extern crate futures;
 extern crate chrono;
 extern crate sysinfo;
+extern crate mpd;
 
 mod codec;
 mod controller;
@@ -17,6 +18,8 @@ mod i3status;
 mod systeminfo;
 mod time;
 mod icon;
+//mod my_io;
+mod media;
 
 use std::cell::RefCell;
 use std::rc::Rc;
