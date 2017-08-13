@@ -11,6 +11,7 @@ pub struct Controller {
 
     error: Option<Block>,
 
+    media: Option<Block>,
     disk_info: Option<Block>,
     networks: Vec<Block>,
     battery: Option<Block>,
@@ -40,6 +41,7 @@ impl Controller {
             stdout: send,
             error: None,
 
+            media: None,
             disk_info: None,
             networks: Vec::new(),
             battery: None,
@@ -59,6 +61,7 @@ impl Controller {
         if let Some(err) = self.error.as_ref() {
             elements.push(err.clone());
         }
+        self.media.as_ref().map(|e| elements.push(e.clone()));
         if let Some(e) = self.disk_info.as_ref() {
             elements.push(e.clone());
         }
@@ -85,6 +88,10 @@ impl Controller {
         let mut line = json::to_string(&elements).unwrap();
         line += ",";
         self.stdout.send(line).unwrap()
+    }
+
+    pub fn set_media(&mut self, media: Option<Block>) {
+        self.media = media;
     }
 
     pub fn set_disk_info(&mut self, disk_info: Block) {

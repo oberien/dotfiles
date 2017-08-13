@@ -26,5 +26,6 @@ pub const CYCLE: [char; 6] = [NIGHT, SUNRISE, SUNRISE2, SUN, SUNSET, DUSK];
 pub const CALENDAR: char = '\u{1f4c6}';
 pub const NOTE: char = '\u{266b}';
 pub const PAUSED: char = '\u{23f8}';
+pub const STOPPED: char = '\u{25a0}';
 pub const STRIKETHROUGH: char = '\u{20e0}';
 // moon phase: 0x1f311 + n

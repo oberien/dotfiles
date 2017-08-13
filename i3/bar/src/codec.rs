@@ -108,50 +108,62 @@ impl BlockBuilder {
             }
         }
     }
+    #[allow(dead_code)]
     pub fn short_text(mut self, short_text: String) -> BlockBuilder {
         self.block.short_text = Some(short_text);
         self
     }
+    #[allow(dead_code)]
     pub fn color(mut self, color: String) -> BlockBuilder {
         self.block.color = Some(color);
         self
     }
+    #[allow(dead_code)]
     pub fn background(mut self, background: String) -> BlockBuilder {
         self.block.background = Some(background);
         self
     }
+    #[allow(dead_code)]
     pub fn border(mut self, border: String) -> BlockBuilder {
         self.block.border = Some(border);
         self
     }
+    #[allow(dead_code)]
     pub fn min_width(mut self, min_width: u32) -> BlockBuilder {
         self.block.min_width = Some(min_width);
         self
     }
+    #[allow(dead_code)]
     pub fn align(mut self, align: Align) -> BlockBuilder {
         self.block.align = Some(align);
         self
     }
+    #[allow(dead_code)]
     pub fn name(mut self, name: String) -> BlockBuilder {
         self.block.name = Some(name);
         self
     }
+    #[allow(dead_code)]
     pub fn instance(mut self, instance: String) -> BlockBuilder {
         self.block.instance = Some(instance);
         self
     }
+    #[allow(dead_code)]
     pub fn urgent(mut self, urgent: bool) -> BlockBuilder {
         self.block.urgent = Some(urgent);
         self
     }
+    #[allow(dead_code)]
     pub fn separator(mut self, separator: bool) -> BlockBuilder {
         self.block.separator = Some(separator);
         self
     }
+    #[allow(dead_code)]
     pub fn separator_block_width(mut self, separator_block_width: u32) -> BlockBuilder {
         self.block.separator_block_width = Some(separator_block_width);
         self
     }
+    #[allow(dead_code)]
     pub fn markup(mut self, markup: Markup) -> BlockBuilder {
         self.block.markup = markup;
         self

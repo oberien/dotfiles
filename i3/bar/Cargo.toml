@@ -17,3 +17,6 @@ futures = "0.1"
 chrono = "0.4"
 sysinfo = "0.3"
 mpd = "0.0"
+
+[replace]
+"mpd:0.0.12" = { git = "https://github.com/oberien/rust-mpd" }
