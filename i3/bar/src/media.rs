@@ -41,6 +41,11 @@ impl Info {
                 name += " - ";
             }
             if let Some(title) = self.title.as_ref() {
+                // some people just want to see the world burn
+                // and put "Artist - Title" as title
+                if title.contains(&name) {
+                    name = String::new();
+                }
                 name += &title;
             }
             format!("{} ({}:{:02} / {}:{:02}) {}", icon, elapsed / 60, elapsed % 60, total / 60, total % 60, name)
