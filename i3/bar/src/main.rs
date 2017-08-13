@@ -11,6 +11,8 @@ extern crate futures;
 extern crate chrono;
 extern crate sysinfo;
 extern crate mpd;
+extern crate mio;
+extern crate libc;
 
 mod codec;
 mod controller;
@@ -19,8 +21,9 @@ mod systeminfo;
 mod icon;
 mod timer;
 mod time;
-//mod my_io;
+mod my_io;
 mod media;
+mod backlight;
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -43,9 +46,9 @@ fn main() {
     let sysinfo = systeminfo::systeminfo(controller.clone());
     let (media, media_timer) = media::mpd(controller.clone());
     let timer = timer::execute(controller.clone(), vec![Box::new(time::time), media_timer]);
-    // TODO: brightness
+    let backlight = backlight::backlight(controller.clone(), &handle);
     // TODO: moon phase
-    let joined = future::join_all(vec![i3status, sysinfo, timer, media]);
+    let joined = future::join_all(vec![i3status, sysinfo, timer, media, backlight]);
 
     core.run(joined).unwrap();
 }

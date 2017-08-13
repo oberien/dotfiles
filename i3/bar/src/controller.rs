@@ -12,6 +12,7 @@ pub struct Controller {
     error: Option<Block>,
 
     media: Option<Block>,
+    backlight: Option<Block>,
     disk_info: Option<Block>,
     networks: Vec<Block>,
     battery: Option<Block>,
@@ -42,6 +43,7 @@ impl Controller {
             error: None,
 
             media: None,
+            backlight: None,
             disk_info: None,
             networks: Vec::new(),
             battery: None,
@@ -62,6 +64,7 @@ impl Controller {
             elements.push(err.clone());
         }
         self.media.as_ref().map(|e| elements.push(e.clone()));
+        self.backlight.as_ref().map(|e| elements.push(e.clone()));
         if let Some(e) = self.disk_info.as_ref() {
             elements.push(e.clone());
         }
@@ -92,6 +95,10 @@ impl Controller {
 
     pub fn set_media(&mut self, media: Option<Block>) {
         self.media = media;
+    }
+
+    pub fn set_backlight(&mut self, backlight: Block) {
+        self.backlight = Some(backlight);
     }
 
     pub fn set_disk_info(&mut self, disk_info: Block) {
