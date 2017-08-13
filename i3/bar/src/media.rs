@@ -3,6 +3,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::thread;
 use std::time::Duration;
+use std::path::Path;
 
 use futures::{Future, Stream};
 use futures::sync::mpsc;
@@ -16,6 +17,7 @@ use timer::Fun;
 
 #[derive(Debug)]
 struct Info {
+    file: Option<String>,
     title: Option<String>,
     artist: Option<String>,
     elapsed: Option<Duration>,
@@ -47,6 +49,8 @@ impl Info {
                     name = String::new();
                 }
                 name += &title;
+            } else {
+                name += Path::new(self.file.as_ref().unwrap()).file_stem().unwrap().to_str().unwrap();
             }
             format!("{} ({}:{:02} / {}:{:02}) {}", icon, elapsed / 60, elapsed % 60, total / 60, total % 60, name)
         };
@@ -70,15 +74,18 @@ pub fn mpd(controller: Rc<RefCell<Controller>>) -> (Box<Future<Item=(), Error=io
                         Ok(status) => status,
                         Err(_) => break
                     };
+                    let mut file = None;
                     let mut title = None;
                     let mut artist = None;
                     if let Some(song) = song {
+                        file = Some(song.file);
                         title = song.title;
                         artist = song.artist;
                     }
                     send.send(Some(Info {
-                        title: title,
-                        artist: artist,
+                        file,
+                        title,
+                        artist,
                         elapsed: status.elapsed.map(|t| t.to_std().unwrap()),
                         total: status.time.map(|t| t.1.to_std().unwrap()),
                         state: status.state,
