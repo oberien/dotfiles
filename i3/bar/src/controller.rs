@@ -1,15 +1,14 @@
-use std::sync::mpsc::{self, Sender};
-use std::thread;
-use std::io::{self, Write};
+use futures::sync::mpsc::UnboundedSender;
+use tokio_core::reactor::Handle;
 
-use serde_json as json;
-
-use codec::{Block, BlockBuilder};
+use codec::{Block, BlockBuilder, Header, Element};
+use stdout;
 
 pub struct Controller {
-    stdout: Sender<String>,
+    stdout: UnboundedSender<Element>,
 
-    error: Option<Block>,
+    error_idx: u64,
+    errors: Vec<Block>,
 
     media: Option<Block>,
     backlight: Option<Block>,
@@ -26,21 +25,20 @@ pub struct Controller {
 }
 
 impl Controller {
-    pub fn new() -> Controller {
-        let (send, recv) = mpsc::channel();
-        thread::spawn(move || {
-            while let Ok(line) = recv.recv() {
-                let stdout = io::stdout();
-                let mut stdout = stdout.lock();
-                writeln!(stdout, "{}", line).unwrap();
-            }
-        });
+    pub fn new(handle: &Handle) -> Controller {
+        let send = stdout::stdout(handle);
         // init
-        send.send("{\"version\":1}".to_string()).unwrap();
-        send.send("[".to_string()).unwrap();
+        (&send).send(Element::Header(Header {
+            version: 1,
+            stop_signal: None,
+            cont_signal: None,
+            click_events: None,
+        })).unwrap();
+        (&send).send(Element::OpenStream).unwrap();
         Controller {
             stdout: send,
-            error: None,
+            error_idx: 0,
+            errors: Vec::new(),
 
             media: None,
             backlight: None,
@@ -58,39 +56,37 @@ impl Controller {
     }
 
     pub fn update(&self) {
-        let mut elements = Vec::new();
+        let mut blocks = Vec::new();
 
-        if let Some(err) = self.error.as_ref() {
-            elements.push(err.clone());
+        for error in &self.errors {
+            blocks.push(error.clone());
         }
-        self.media.as_ref().map(|e| elements.push(e.clone()));
-        self.backlight.as_ref().map(|e| elements.push(e.clone()));
+        self.media.as_ref().map(|e| blocks.push(e.clone()));
+        self.backlight.as_ref().map(|e| blocks.push(e.clone()));
         if let Some(e) = self.disk_info.as_ref() {
-            elements.push(e.clone());
+            blocks.push(e.clone());
         }
         for network in &self.networks {
-            elements.push(network.clone());
+            blocks.push(network.clone());
         }
         if let Some(e) = self.battery.as_ref() {
-            elements.push(e.clone());
+            blocks.push(e.clone());
         }
         if let Some(e) = self.cpu_usage.as_ref() {
-            elements.push(e.clone());
+            blocks.push(e.clone());
         }
         if let Some(e) = self.load.as_ref() {
-            elements.push(e.clone());
+            blocks.push(e.clone());
         }
-        self.ram.as_ref().map(|e| elements.push(e.clone()));
-        self.swap.as_ref().map(|e| elements.push(e.clone()));
-        self.time.as_ref().map(|e| elements.push(e.clone()));
-        self.date.as_ref().map(|e| elements.push(e.clone()));
+        self.ram.as_ref().map(|e| blocks.push(e.clone()));
+        self.swap.as_ref().map(|e| blocks.push(e.clone()));
+        self.time.as_ref().map(|e| blocks.push(e.clone()));
+        self.date.as_ref().map(|e| blocks.push(e.clone()));
         for unknown in &self.unknown {
-            elements.push(unknown.clone());
+            blocks.push(unknown.clone());
         }
 
-        let mut line = json::to_string(&elements).unwrap();
-        line += ",";
-        self.stdout.send(line).unwrap()
+        (&self.stdout).send(Element::Blocks(blocks)).unwrap()
     }
 
     pub fn set_media(&mut self, media: Option<Block>) {
@@ -142,14 +138,16 @@ impl Controller {
     }
 
     pub fn push_error(&mut self, error: String) {
-        if let Some(err) = self.error.as_mut() {
-            err.full_text.push(';');
-            err.full_text.push_str(&error);
-            return;
-        }
-        self.error = Some(BlockBuilder::new(error)
-            .name("error".to_string())
+        self.errors.push(BlockBuilder::new(error)
+            .name(format!("error{}", self.error_idx))
             .color("#FF0000".to_string())
             .build());
+        self.error_idx += 1;
+    }
+
+    pub fn clear_error(&mut self, name: &str) {
+        let pos = self.errors.iter().position(|e| e.name.as_ref().unwrap() == name).unwrap();
+        self.errors.remove(pos);
+        self.update();
     }
 }

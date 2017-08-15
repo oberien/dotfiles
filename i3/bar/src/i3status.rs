@@ -9,7 +9,7 @@ use tokio_process::CommandExt;
 use tokio_io::io;
 
 use controller::Controller;
-use codec::{Codec, Block};
+use codec::{Codec, Block, Element};
 use icon;
 
 pub fn i3status(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Future<Item=(), Error=Error>> {
@@ -30,7 +30,7 @@ pub fn i3status(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Fut
     });
     let future = elements.for_each(move |opt| {
         let mut controller = controller.borrow_mut();
-        if let Some(vec) = opt {
+        if let Element::Blocks(vec) = opt {
             let mut networks = Vec::new();
             let mut unknown = Vec::new();
             for e in vec {
@@ -91,14 +91,18 @@ fn battery(mut e: Block) -> Result<Block, String> {
         let mut split = e.full_text.split(' ');
         let status = split.next().unwrap();
         let percentage = split.next().unwrap();
-        let remaining = split.next().unwrap();
         let icon = match status {
             "BAT" => icon::BATTERY,
             "CHR" => icon::HOURGLASS,
             "FULL" => icon::CABLE,
             status => return Err(format!("Unknown Battery Status: {}", status))
         };
-        format!("{} {} {}", icon, percentage, remaining)
+        let mut res = format!("{} {}", icon, percentage);
+        if let Some(remaining) = split.next() {
+            res += " ";
+            res += &remaining;
+        }
+        res
     };
     Ok(e)
 }

@@ -11,17 +11,18 @@ extern crate futures;
 extern crate chrono;
 extern crate sysinfo;
 extern crate mpd;
-extern crate mio;
-extern crate libc;
+extern crate tokio_file_unix;
+extern crate owning_ref;
 
 mod codec;
+mod stdin;
+mod stdout;
 mod controller;
 mod i3status;
 mod systeminfo;
 mod icon;
 mod timer;
 mod time;
-mod my_io;
 mod media;
 mod backlight;
 
@@ -34,21 +35,20 @@ use futures::future;
 use controller::Controller;
 
 fn main() {
-    // TODO: Use tokio_file_unix for stdout handling
     // TODO: Make controller hold all streams and be a stream itself?
-    // TODO: stdin with click event handling
     // TODO: Make mpd async
     let mut core = Core::new().unwrap();
     let handle = core.handle();
 
-    let controller = Rc::new(RefCell::new(Controller::new()));
+    let controller = Rc::new(RefCell::new(Controller::new(&handle)));
     let i3status = i3status::i3status(controller.clone(), &handle);
     let sysinfo = systeminfo::systeminfo(controller.clone());
     let (media, media_timer) = media::mpd(controller.clone());
     let timer = timer::execute(controller.clone(), vec![Box::new(time::time), media_timer]);
     let backlight = backlight::backlight(controller.clone(), &handle);
+    let stdin = stdin::stdin(controller.clone(), &handle);
     // TODO: moon phase
-    let joined = future::join_all(vec![i3status, sysinfo, timer, media, backlight]);
+    let joined = future::join_all(vec![i3status, sysinfo, timer, media, backlight, stdin]);
 
     core.run(joined).unwrap();
 }

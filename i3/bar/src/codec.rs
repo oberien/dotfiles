@@ -1,15 +1,25 @@
 use std::io;
 
 use serde_json as json;
+use tokio_io::codec::Encoder as Enc;
+use bytes::BytesMut;
 
 // TODO: Proper color (de-)serialization
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum Element {
+    Header(Header),
+    OpenStream,
+    Blocks(Vec<Block>),
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Header {
-    version: u32,
-    stop_signal: Option<u32>,
-    cont_signal: Option<u32>,
-    click_events: Option<bool>,
+    pub version: u32,
+    pub stop_signal: Option<u32>,
+    pub cont_signal: Option<u32>,
+    pub click_events: Option<bool>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -59,7 +69,7 @@ pub struct Block {
 
 enum State {
     // {"version":1}
-    AwaitingVersion,
+    AwaitingHeader,
     // [
     AwaitingOpenStream,
     // [{...},...]
@@ -73,25 +83,46 @@ pub struct Codec {
 impl Codec {
     pub fn new() -> Codec {
         Codec {
-            state: State::AwaitingVersion,
+            state: State::AwaitingHeader,
         }
     }
 
-    pub fn decode_line(&mut self, line: &str) -> io::Result<Option<Vec<Block>>> {
+    pub fn decode_line(&mut self, line: &str) -> io::Result<Element> {
         match self.state {
-            State::AwaitingVersion => {
-                assert_eq!(line, "{\"version\":1}");
+            State::AwaitingHeader => {
+                let res = json::from_str(line)?;
                 self.state = State::AwaitingOpenStream;
-                Ok(None)
+                Ok(Element::Header(res))
             }
             State::AwaitingOpenStream => {
                 assert_eq!(line, "[");
                 self.state = State::AwaitingData;
-                Ok(None)
+                Ok(Element::OpenStream)
             }
-            State::AwaitingData => json::from_str(line).map_err(|e| e.into()).map(Some)
+            State::AwaitingData => Ok(json::from_str(line)?)
         }
     }
+}
+
+pub struct Encoder;
+
+impl Enc for Encoder {
+    type Item = Element;
+    type Error = io::Error;
+
+    fn encode(&mut self, element: Element, dst: &mut BytesMut) -> Result<(), io::Error> {
+        let line = match element {
+            Element::Header(data) => json::to_string(&data)? + "\n",
+            Element::Blocks(data) => json::to_string(&data)? + ",\n",
+            Element::OpenStream => "[\n".to_string(),
+        };
+        dst.extend(line.bytes());
+        Ok(())
+    }
+}
+
+pub fn decode_event(line: String) -> io::Result<ClickEvent> {
+    Ok(json::from_str(&line)?)
 }
 
 #[derive(Debug, Clone)]

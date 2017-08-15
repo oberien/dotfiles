@@ -1,14 +1,13 @@
 use std::rc::Rc;
 use std::cell::RefCell;
-use std::io::{self, Read};
+use std::io::{self, Read, Seek, SeekFrom};
 use std::fs::File;
-use std::mem;
+use std::os::unix::io::{FromRawFd, AsRawFd};
 
 use tokio_core::reactor::{PollEvented, Handle};
 use futures::{future, Future, Stream, Async, Poll};
-use libc;
+use tokio_file_unix::File as AsyncFile;
 
-use my_io::MyIo;
 use controller::Controller;
 use codec::BlockBuilder;
 use icon;
@@ -38,8 +37,8 @@ pub fn backlight(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Fu
 pub struct Backlight {
     max_buf: String,
     actual_buf: String,
-    max: PollEvented<MyIo>,
-    actual: PollEvented<MyIo>,
+    max: PollEvented<AsyncFile<File>>,
+    actual: PollEvented<AsyncFile<File>>,
     max_brightness: Option<u32>,
     actual_brightness: Option<u32>,
 }
@@ -52,13 +51,11 @@ impl Backlight {
         let res = Backlight {
             max_buf: String::new(),
             actual_buf: String::new(),
-            max: PollEvented::new(MyIo::new(&max), handle)?,
-            actual: PollEvented::new(MyIo::new(&actual), handle)?,
+            max: AsyncFile::raw_new(max).into_io(handle)?,
+            actual: AsyncFile::raw_new(actual).into_io(handle)?,
             max_brightness: None,
             actual_brightness: None,
         };
-        mem::forget(max);
-        mem::forget(actual);
         Ok(res)
     }
 }
@@ -87,8 +84,8 @@ impl Stream for Backlight {
         assert_eq!(buf.pop(), Some('\n'));
         let value = buf.parse().unwrap();
         buf.clear();
-        let res = unsafe { libc::lseek(pe.get_ref().fd, 0, libc::SEEK_SET) };
-        assert!(res >= 0);
+        let mut file = unsafe { File::from_raw_fd(pe.get_ref().as_raw_fd()) };
+        file.seek(SeekFrom::Start(0))?;
         if max {
             self.max_brightness = Some(value);
         } else {
