@@ -26,6 +26,8 @@ mod time;
 mod media;
 mod backlight;
 mod sysfs;
+// rip poll on power_supply
+//mod battery;
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -37,7 +39,6 @@ use controller::Controller;
 
 fn main() {
     // TODO: Make controller hold all streams and be a stream itself?
-    // TODO: Handle battery manually with sysfs
     // TODO: Show all backlight available (if that's even a thing)
     // TODO: Show all batteries available (if that's even a thing)
     // TODO: Fetch cpu_usage and load information from sysinfo

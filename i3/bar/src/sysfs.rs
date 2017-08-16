@@ -34,12 +34,10 @@ impl Sysfs {
         let iter = fs::read_dir(dir)?;
         let res = iter.filter_map(|f| {
             if let Ok(ref entry) = f {
-                if let Ok(typ) = entry.file_type() {
-                    let path = entry.path();
-                    let name = path.file_name().unwrap().to_str().unwrap();
-                    if prefix.is_none() || name.starts_with(prefix.unwrap()) {
-                        return Some(entry.path());
-                    }
+                let path = entry.path();
+                let name = path.file_name().unwrap().to_str().unwrap();
+                if prefix.is_none() || name.starts_with(prefix.unwrap()) {
+                    return Some(entry.path());
                 }
             }
             None
