@@ -12,13 +12,12 @@ use codec::BlockBuilder;
 use icon;
 
 pub fn backlight(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Future<Item=(), Error=io::Error>> {
-    let max = Sysfs::new_absolute("/sys/class/backlight/intel_backlight/max_brightness", handle);
-    let actual = Sysfs::new_absolute("/sys/class/backlight/intel_backlight/actual_brightness", handle);
-    let (max, actual) = match (max, actual) {
-        (Ok(max), Ok(actual)) => (max, actual),
-        // ignore nonexistent backlight
+    let path = match Sysfs::backlights() {
+        Ok(ref mut vec) if vec.len() > 0 => vec.remove(0),
         _ => return Box::new(future::ok(()))
     };
+    let max = Sysfs::new(path.join("max_brightness"), handle).unwrap();
+    let actual = Sysfs::new(path.join("actual_brightness"), handle).unwrap();
     let max = max.and_then(|s| s.trim().parse::<u32>().map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
     let actual = actual.and_then(|s| s.trim().parse::<u32>().map_err(|e| io::Error::new(io::ErrorKind::Other, e)));
     let merged = max.merge(actual);

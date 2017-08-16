@@ -1,6 +1,6 @@
 use std::io::{self, Read, Seek, SeekFrom};
-use std::fs::File;
-use std::path::Path;
+use std::fs::{self, File};
+use std::path::{Path, PathBuf};
 use std::os::unix::io::{FromRawFd, AsRawFd};
 use std::mem;
 
@@ -14,12 +14,37 @@ pub struct Sysfs {
 }
 
 impl Sysfs {
-    pub fn new_absolute<P: AsRef<Path>>(path: P, handle: &Handle) -> io::Result<Sysfs> {
+    pub fn new<P: AsRef<Path>>(path: P, handle: &Handle) -> io::Result<Sysfs> {
         let file = File::open(path)?;
         Ok(Sysfs {
             buf: String::new(),
             pe: AsyncFile::raw_new(file).into_io(handle)?,
         })
+    }
+
+    pub fn backlights() -> io::Result<Vec<PathBuf>> {
+        Self::read_dir("/sys/class/backlight/", None)
+    }
+
+    pub fn batteries() -> io::Result<Vec<PathBuf>> {
+        Self::read_dir("/sys/class/power_supply/", Some("BAT"))
+    }
+
+    pub fn read_dir<P: AsRef<Path>>(dir: P, prefix: Option<&str>) -> io::Result<Vec<PathBuf>> {
+        let iter = fs::read_dir(dir)?;
+        let res = iter.filter_map(|f| {
+            if let Ok(ref entry) = f {
+                if let Ok(typ) = entry.file_type() {
+                    let path = entry.path();
+                    let name = path.file_name().unwrap().to_str().unwrap();
+                    if prefix.is_none() || name.starts_with(prefix.unwrap()) {
+                        return Some(entry.path());
+                    }
+                }
+            }
+            None
+        }).collect();
+        Ok(res)
     }
 }
 
