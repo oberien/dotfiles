@@ -103,7 +103,7 @@ pub fn mpd(controller: Rc<RefCell<Controller>>) -> (Box<Future<Item=(), Error=io
     let info = Rc::new(RefCell::new(None));
     let info2 = info.clone();
     let mpd = recv.for_each(move |opt| {
-        controller.borrow_mut().set_media(opt.as_ref().map(|i| i.to_element()));
+        controller.borrow_mut().set_mpd(opt.as_ref().map(|i| i.to_element()));
         controller.borrow_mut().update();
         *info.borrow_mut() = opt;
         Ok(())
@@ -116,7 +116,7 @@ pub fn mpd(controller: Rc<RefCell<Controller>>) -> (Box<Future<Item=(), Error=io
                     *time += Duration::new(1, 0);
                 }
             }
-            controller.set_media(Some(info.to_element()));
+            controller.set_mpd(Some(info.to_element()));
         }
         Ok(())
     };

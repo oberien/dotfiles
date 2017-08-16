@@ -1,5 +1,8 @@
+use std::thread;
+
 use futures::sync::mpsc::UnboundedSender;
 use tokio_core::reactor::Handle;
+use mpd::Client;
 
 use codec::{Block, BlockBuilder, Header, Element};
 use stdout;
@@ -10,7 +13,7 @@ pub struct Controller {
     error_idx: u64,
     errors: Vec<Block>,
 
-    media: Option<Block>,
+    mpd: Option<Block>,
     backlight: Option<Block>,
     disk_info: Option<Block>,
     networks: Vec<Block>,
@@ -32,7 +35,7 @@ impl Controller {
             version: 1,
             stop_signal: None,
             cont_signal: None,
-            click_events: None,
+            click_events: Some(true),
         })).unwrap();
         (&send).send(Element::OpenStream).unwrap();
         Controller {
@@ -40,7 +43,7 @@ impl Controller {
             error_idx: 0,
             errors: Vec::new(),
 
-            media: None,
+            mpd: None,
             backlight: None,
             disk_info: None,
             networks: Vec::new(),
@@ -61,7 +64,7 @@ impl Controller {
         for error in &self.errors {
             blocks.push(error.clone());
         }
-        self.media.as_ref().map(|e| blocks.push(e.clone()));
+        self.mpd.as_ref().map(|e| blocks.push(e.clone()));
         self.backlight.as_ref().map(|e| blocks.push(e.clone()));
         if let Some(e) = self.disk_info.as_ref() {
             blocks.push(e.clone());
@@ -89,8 +92,8 @@ impl Controller {
         (&self.stdout).send(Element::Blocks(blocks)).unwrap()
     }
 
-    pub fn set_media(&mut self, media: Option<Block>) {
-        self.media = media;
+    pub fn set_mpd(&mut self, mpd: Option<Block>) {
+        self.mpd = mpd;
     }
 
     pub fn set_backlight(&mut self, backlight: Block) {
@@ -149,5 +152,13 @@ impl Controller {
         let pos = self.errors.iter().position(|e| e.name.as_ref().unwrap() == name).unwrap();
         self.errors.remove(pos);
         self.update();
+    }
+
+    pub fn toggle_mpd(&mut self) {
+        // FIXME
+        thread::spawn(|| {
+            let mut client = Client::default();
+            client.toggle_pause().unwrap();
+        });
     }
 }

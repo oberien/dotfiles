@@ -121,8 +121,16 @@ impl Enc for Encoder {
     }
 }
 
-pub fn decode_event(line: String) -> io::Result<ClickEvent> {
-    Ok(json::from_str(&line)?)
+pub fn decode_event(line: String) -> io::Result<Option<ClickEvent>> {
+    let mut line = line.trim();
+    if line == "[" {
+        return Ok(None);
+    }
+    if line.starts_with(',') {
+        line = &line[1..];
+    }
+    let res = json::from_str(line)?;
+    Ok(res)
 }
 
 #[derive(Debug, Clone)]
