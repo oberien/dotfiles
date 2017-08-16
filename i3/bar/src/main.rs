@@ -25,6 +25,7 @@ mod timer;
 mod time;
 mod media;
 mod backlight;
+mod sysfs;
 
 use std::cell::RefCell;
 use std::rc::Rc;
