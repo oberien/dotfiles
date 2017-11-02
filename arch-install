@@ -126,7 +126,7 @@ pacman -S wget
 pacman -S openssh
 pacman -S openvpn
 
-# pacaur instead of pacaur, because it's secure™
+# pacaur instead of yaourt, because it's secure™
 # https://gist.github.com/Tadly/0e65d30f279a34c33e9b
 mkdir -p /tmp/pacaur_install
 cd /tmp/pacaur_install
