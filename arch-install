@@ -164,6 +164,7 @@ pacman -S pm-utils
 pacman -S tree
 pacman -S dosfstools
 pacman -S ntfs-3g
+pacman -S ncdu
 
 # media
 pacman -S mpd
