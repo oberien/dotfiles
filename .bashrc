@@ -119,4 +119,4 @@ export ATISTREAMSDKROOT=$AMDAPPSDKROOT
 
 export PATH=$PATH:/userPath/programs/startscripts
 
-nvm use stable
+#nvm use stable
