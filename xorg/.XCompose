@@ -1,0 +1,46 @@
+include "%H/.XCompose-neo"
+
+# Overrides
+<Multi_key> <r> <e> <space>               : "ℜ"   U211C # BLACK-LETTER CAPITAL R
+
+# Regional indicators
+<Multi_key> <r> <e> <a>                   : "🇦" # REGIONAL INDICATOR SYMBOL LETTER A
+<Multi_key> <r> <e> <b>                   : "🇧" # REGIONAL INDICATOR SYMBOL LETTER B
+<Multi_key> <r> <e> <c>                   : "🇨" # REGIONAL INDICATOR SYMBOL LETTER C
+<Multi_key> <r> <e> <d>                   : "🇩" # REGIONAL INDICATOR SYMBOL LETTER D
+<Multi_key> <r> <e> <e>                   : "🇪" # REGIONAL INDICATOR SYMBOL LETTER E
+<Multi_key> <r> <e> <f>                   : "🇫" # REGIONAL INDICATOR SYMBOL LETTER F
+<Multi_key> <r> <e> <g>                   : "🇬" # REGIONAL INDICATOR SYMBOL LETTER G
+<Multi_key> <r> <e> <h>                   : "🇭" # REGIONAL INDICATOR SYMBOL LETTER H
+<Multi_key> <r> <e> <i>                   : "🇮" # REGIONAL INDICATOR SYMBOL LETTER I
+<Multi_key> <r> <e> <j>                   : "🇯" # REGIONAL INDICATOR SYMBOL LETTER J
+<Multi_key> <r> <e> <k>                   : "🇰" # REGIONAL INDICATOR SYMBOL LETTER K
+<Multi_key> <r> <e> <l>                   : "🇱" # REGIONAL INDICATOR SYMBOL LETTER L
+<Multi_key> <r> <e> <m>                   : "🇲" # REGIONAL INDICATOR SYMBOL LETTER M
+<Multi_key> <r> <e> <n>                   : "🇳" # REGIONAL INDICATOR SYMBOL LETTER N
+<Multi_key> <r> <e> <o>                   : "🇴" # REGIONAL INDICATOR SYMBOL LETTER O
+<Multi_key> <r> <e> <p>                   : "🇵" # REGIONAL INDICATOR SYMBOL LETTER P
+<Multi_key> <r> <e> <q>                   : "🇶" # REGIONAL INDICATOR SYMBOL LETTER Q
+<Multi_key> <r> <e> <r>                   : "🇷" # REGIONAL INDICATOR SYMBOL LETTER R
+<Multi_key> <r> <e> <s>                   : "🇸" # REGIONAL INDICATOR SYMBOL LETTER S
+<Multi_key> <r> <e> <t>                   : "🇹" # REGIONAL INDICATOR SYMBOL LETTER T
+<Multi_key> <r> <e> <u>                   : "🇺" # REGIONAL INDICATOR SYMBOL LETTER U
+<Multi_key> <r> <e> <v>                   : "🇻" # REGIONAL INDICATOR SYMBOL LETTER V
+<Multi_key> <r> <e> <w>                   : "🇼" # REGIONAL INDICATOR SYMBOL LETTER W
+<Multi_key> <r> <e> <x>                   : "🇽" # REGIONAL INDICATOR SYMBOL LETTER X
+<Multi_key> <r> <e> <y>                   : "🇾" # REGIONAL INDICATOR SYMBOL LETTER Y
+<Multi_key> <r> <e> <z>                   : "🇿" # REGIONAL INDICATOR SYMBOL LETTER Z
+
+# important stuff
+<Multi_key> <ellipsis> <asciicircum>      : "᪴" U1AB4 # COMBINING TRIPLE DOT
+<Multi_key> <s> <h> <r> <u> <g>           : "¯\\_(ツ)_/¯" # SHRUG
+<Multi_key> <h> <e> <l> <i>               : "🚁"  U1F681 # HELICOPTER
+<Multi_key> <b> <e> <e>                   : "🐝"  U1F41D # HONEYBEE
+<Multi_key> <g> <g>                       : "ΓΓ" # GG
+<Multi_key> <plus> <1>                    : "👍"  U1F44D
+<Multi_key> <plus> <KP_1>                 : "👍"  U1F44D
+<Multi_key> <colon> <D>                   : "😀"  U1F600
+<Multi_key> <colon> <o>                   : "😮"  U1F632
+<Multi_key> <colon> <O>                   : "😲"  U1F632
+<Multi_key> <2> <b>                       : "2 🐝 ∨ ¬ 2 🐝" # TO BE OR NOT TO BE
+<Multi_key> <KP_2> <b>                       : "2 🐝 ∨ ¬ 2 🐝" # TO BE OR NOT TO BE
