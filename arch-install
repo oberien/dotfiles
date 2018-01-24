@@ -206,3 +206,22 @@ pacman -S rustup
 
 # maybe
 pacman -S gparted
+pacman -S gucharmap
+
+# cups (not working ☹)
+pacman -S avahi
+pacman -S cups
+sudo gpasswd -a `whoami` lp
+sudo gpasswd -a `whoami` sys
+# drivers, install required ones
+pacman -S gutenprint # Canon, Epson, Lexmark, Sony, Olympus, PCL
+pacman -S foomatic foomatic-db foomatic-db:engine, foomatic-db-ppd foomatic-filters
+pacman -S hplip # HP
+pacman -S splix # Samsung
+pacman -S cups-pdf # Print to PDF
+systemctl enable avahi-dnsconfd.service
+systemctl enable org.cups.cupsd.service
+systemctl enable cups-browsed.service
+systemctl start avahi-dnsconfd.service
+systemctl start org.cups.cupsd.service
+systemctl start cups-browsed.service
