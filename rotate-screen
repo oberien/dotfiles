@@ -1,0 +1,74 @@
+#!/bin/sh
+# This script rotates the screen and touchscreen input 90 degrees each time it is called, 
+# also disables the touchpad, and enables the virtual keyboard accordingly
+ 
+# by Ruben Barkow: https://gist.github.com/rubo77/daa262e0229f6e398766
+# modified by oberien
+ 
+#### configuration
+# find your Touchscreen device with `xinput`
+TouchscreenDevice='ELAN22CA:00 04F3:22CA'
+Stylus='ELAN Pen Fix Pen (0)'
+ 
+if [ "$1" = "--help"  ] || [ "$1" = "-h"  ] || [ -z "$1" ] ; then
+echo 'Usage: rotate-screen [OPTION]'
+echo
+echo 'This script rotates the screen and touchscreen input 90 degrees each time it is called,' 
+echo 'also disables the touchpad, and enables the virtual keyboard accordingly'
+echo
+echo Usage:
+echo ' -h --help display this help'
+echo ' 0 / normal set screen rotation to normal'
+echo ' 1 / left set screen rotation to left'
+echo ' 2 / inverted set screen rotation to inverted'
+echo ' 3 / right set screen rotation to right'
+exit 0
+fi
+ 
+# Matrix for rotation
+# ⎡ 1 0 0 ⎤
+# ⎜ 0 1 0 ⎥
+# ⎣ 0 0 1 ⎦
+normal='1 0 0 0 1 0 0 0 1'
+ 
+#⎡ -1  0 1 ⎤
+#⎜  0 -1 1 ⎥
+#⎣  0  0 1 ⎦
+inverted='-1 0 1 0 -1 1 0 0 1'
+ 
+# 90° to the left 
+# ⎡ 0 -1 1 ⎤
+# ⎜ 1  0 0 ⎥
+# ⎣ 0  0 1 ⎦
+left='0 -1 1 1 0 0 0 0 1'
+ 
+# 90° to the right
+#⎡  0 1 0 ⎤
+#⎜ -1 0 1 ⎥
+#⎣  0 0 1 ⎦
+right='0 1 0 -1 0 1 0 0 1'
+ 
+if [ "$1" = "0" ] || [ "$1" = "normal" ]
+then
+  echo "Back to normal"
+  xrandr -o normal
+  xinput set-prop "$TouchscreenDevice" 'Coordinate Transformation Matrix' $normal
+  xinput set-prop "$Stylus" 'Coordinate Transformation Matrix' $normal
+elif [ "$1" = "1" ] || [ "$1" = "left" ]
+then
+  echo "90° to the left"
+  xrandr -o left
+  xinput set-prop "$TouchscreenDevice" 'Coordinate Transformation Matrix' $left
+  xinput set-prop "$Stylus" 'Coordinate Transformation Matrix' $left
+elif [ "$1" = "2" ] || [ "$1" = "inverted" ]
+then
+  echo "Upside down"
+  xrandr -o inverted
+  xinput set-prop "$TouchscreenDevice" 'Coordinate Transformation Matrix' $inverted
+  xinput set-prop "$Stylus" 'Coordinate Transformation Matrix' $inverted
+else
+  echo "90° to the right"
+  xrandr -o right
+  xinput set-prop "$TouchscreenDevice" 'Coordinate Transformation Matrix' $right
+  xinput set-prop "$Stylus" 'Coordinate Transformation Matrix' $right
+fi
