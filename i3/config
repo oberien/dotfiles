@@ -195,6 +195,12 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
+mode "none" {
+  bindsym Escape mode "default"
+}
+
+bindsym $mod+Escape mode "none"
+
 # startup programs and bind to workspaces
 exec --no-startup-id i3-msg "workspace $w1; exec vivaldi"
 assign [class="vivaldi-preview"] → $w1
@@ -222,9 +228,11 @@ bindsym XF86AudioRaiseVolume exec --no-startup-id /usr/bin/pulseaudio-ctl up 1
 bindsym XF86AudioLowerVolume exec --no-startup-id /usr/bin/pulseaudio-ctl down 1
 bindsym XF86AudioMute exec --no-startup-id /usr/bin/pulseaudio-ctl mute
 bindsym XF86AudioPlay exec --no-startup-id mpc toggle
-#bindsym XF86AudioStop exec --no-startup-id mpc
+bindsym XF86AudioStop exec --no-startup-id mpc stop
 bindsym XF86AudioPrev exec --no-startup-id mpc prev
 bindsym XF86AudioNext exec --no-startup-id mpc next
+bindsym XF86MonBrightnessDown exec --no-startup-id /usr/bin/xbacklight -dec 10
+bindsym XF86MonBrightnessUp exec --no-startup-id /usr/bin/xbacklight -inc 10
 
 
 bindsym XF86Sleep exec --no-startup-id i3lock
@@ -238,5 +246,6 @@ bar {
         #status_command i3status
         # use custom program
         status_command cd ~/.i3/bar/ && cargo run --release
+        #status_command cd ~/.i3/bar/ && RUST_BACKTRACE=1 cargo run
 }
 
