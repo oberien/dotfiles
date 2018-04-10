@@ -138,6 +138,10 @@ makepkg PKGBUILD --install --needed
 cd ~
 rm -r /tmp/pacaur_install
 
+# make aur builds faster
+# add `MAKEFLAGS="-j$(nproc)"`
+nano /etc/makepkg.conf
+
 # setup neo-layout
 pacaur -S kbd-neo
 localectl set-keymap --no-convert de neo
