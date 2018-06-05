@@ -126,17 +126,16 @@ pacman -S wget
 pacman -S openssh
 pacman -S openvpn
 
+# aurman instead of pacaur, because pacaur is ded since pacman 5.1.0
 # pacaur instead of yaourt, because it's secure™
-# https://gist.github.com/Tadly/0e65d30f279a34c33e9b
-mkdir -p /tmp/pacaur_install
-cd /tmp/pacaur_install
-sudo pacman -S expac yajl git --noconfirm --needed
-curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=cower"
-makepkg PKGBUILD --skippgpcheck --install --needed
-curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pacaur"
+# adapted from https://gist.github.com/Tadly/0e65d30f279a34c33e9b
+mkdir -p /tmp/aurman_install
+cd /tmp/aurman_install
+sudo pacman -S python expac python-requests git python-regex --noconfirm --needed
+curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=aurman"
 makepkg PKGBUILD --install --needed
 cd ~
-rm -r /tmp/pacaur_install
+rm -rf /tmp/aurman_install
 
 # make aur builds faster
 # add `MAKEFLAGS="-j$(nproc)"`
