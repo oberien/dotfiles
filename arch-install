@@ -11,6 +11,8 @@ loadkeys de-latin1
 setfont lat9w-16
 
 # setup partitions
+# If there is already a windows installed on an msdos partition table,
+# change to gpt and recreate the windows partition with the same sections.
 fdisk /dev/device
     # GPT, needed for EFI
     g
@@ -68,7 +70,7 @@ mount $BOOTPARTITION /mnt/boot
 # Using gnome you need to have `exec gnome-session` in you .xinitrc.
 # Additionally if you want to use gdm, run `systemctl enable gdm.service` in the new system
 # pacstrap -i /mnt base base-devel zsh git net-tools networkmanager network-manager-applet gvim cmake gnome gnome-extra
-pacstrap -i /mnt base base-devel zsh git net-tools networkmanager xorg-xserver xorg-xinit xorg-apps rxvt-unicode i3 dmenu gvim cmake
+pacstrap -i /mnt base base-devel zsh git net-tools networkmanager network-manager-applet xorg-xserver xorg-xinit xorg-apps rxvt-unicode i3 dmenu gvim cmake
 genfstab -U /mnt > /mnt/etc/fstab
 cat /mnt/etc/fstab
 
@@ -116,6 +118,13 @@ default arch
 timeout 0
 _EOF_
 
+# TODO
+# If there is a dual-boot Windows, which doesn't show up automatically
+cat <<_EOF_ > /boot/loader/entries/windows.conf
+title Windows
+_EOF_
+
+
 # important packets
 pacman -S python3
 pacman -S python2
@@ -131,7 +140,7 @@ pacman -S openvpn
 # adapted from https://gist.github.com/Tadly/0e65d30f279a34c33e9b
 mkdir -p /tmp/aurman_install
 cd /tmp/aurman_install
-sudo pacman -S python expac python-requests git python-regex --noconfirm --needed
+sudo pacman -S python expac python-requests git python-regex python-dateutil pyalpm python-feedparser --noconfirm --needed
 curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=aurman"
 makepkg PKGBUILD --install --needed
 cd ~
@@ -142,7 +151,7 @@ rm -rf /tmp/aurman_install
 nano /etc/makepkg.conf
 
 # setup neo-layout
-pacaur -S kbd-neo
+aurman -S kbd-neo
 localectl set-keymap --no-convert de neo
 localectl set-x11-keymap --no-convert de thinkpad neo
 
@@ -150,7 +159,7 @@ localectl set-x11-keymap --no-convert de thinkpad neo
 pacman -S dunst
 
 # browser
-pacaur -S vivaldi
+aurman -S vivaldi
 pacman -S firefox
 pacman -S gst-libav
 
@@ -179,7 +188,7 @@ pacman -S ffmpeg
 pacman -S mumble
 pacman -S pulseaudio
 pacman -S pavucontrol
-pacaur -S pulseaudio-ctl
+aurman -S pulseaudio-ctl
 pacman -S thunderbird
 pacman -S pidgin pidgin-otr
 
@@ -192,18 +201,18 @@ pacman -S dnsutils
 # steam
 # enable multilib in /etc/pacman.conf
 pacman -Syu
-pacaur -S steam
+aurman -S steam
 
 # other fonts used for games/wine/vim
-pacaur -S ttf-tahoma
-pacaur -S ttf-ms-fonts
-pacaur -S ttf-dejavu-sans-mono-powerline-git
+aurman -S ttf-tahoma
+aurman -S ttf-ms-fonts
+aurman -S ttf-dejavu-sans-mono-powerline-git
 
 # java
 pacman -S jdk8-openjdk
 pacman -S openjdk8-src
 pacman -S openjdk8-doc
-pacaur -S intellij-idea-ultimate-edition
+aurman -S intellij-idea-ultimate-edition
 
 # rust
 pacman -S rustup
