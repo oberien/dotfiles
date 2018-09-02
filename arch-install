@@ -164,6 +164,7 @@ pacman -S firefox
 pacman -S gst-libav
 
 # useful others
+aurman -S urxvt-font-size-git
 pacman -S evince
 pacman -S feh
 pacman -S imagemagick
@@ -172,7 +173,6 @@ pacman -S unzip
 pacman -S nmap
 pacman -S mlocate
 pacman -S gedit
-pacman -S pm-utils
 pacman -S tree
 pacman -S dosfstools
 pacman -S ntfs-3g

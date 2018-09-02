@@ -44,7 +44,7 @@ URxvt*iso14755: False
 URxvt*iso14755_52: False
 
 ! perl extensions
-URxvt.perl-ext-common: default,url-select,clipboard,keyboard-select,matcher,vtwheel
+URxvt.perl-ext-common: default,url-select,clipboard,keyboard-select,matcher,font-size
 
 URxvt.keysym.S-C-U: perl:url-select:select_next
 URxvt.underlineURLs: true
@@ -60,6 +60,10 @@ URxvt.keysym.Shift-Control-A: perl:keyboard-select:activate
 URxvt.keysym.M-u:             perl:url-select:select_next
 URxvt.keysym.M-Escape:        perl:keyboard-select:activate
 URxvt.keysym.M-s:             perl:keyboard-select:search
+! Ctrl+Up / Down for font resizing
+URxvt.keysym.C-Down:  font-size:decrease
+URxvt.keysym.C-Up:    font-size:increase
+
 
 !window bell via white flash
 URxvt.visualBell: false
