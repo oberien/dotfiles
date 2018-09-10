@@ -154,11 +154,27 @@ impl Controller {
         self.update();
     }
 
-    pub fn toggle_mpd(&mut self) {
+    pub fn mpd_toggle(&mut self) {
         // FIXME
         thread::spawn(|| {
             let mut client = Client::default();
             client.toggle_pause().unwrap();
+        });
+    }
+
+    pub fn mpd_next(&mut self) {
+        // FIXME
+        thread::spawn(|| {
+            let mut client = Client::default();
+            client.next().unwrap();
+        });
+    }
+
+    pub fn mpd_prev(&mut self) {
+        // FIXME
+        thread::spawn(|| {
+            let mut client = Client::default();
+            client.prev().unwrap();
         });
     }
 }

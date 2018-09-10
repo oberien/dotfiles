@@ -38,12 +38,18 @@ pub fn stdin(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Future
     let stream = lines.and_then(codec::decode_event);
     let stream = stream.for_each(move |evt| {
         let mut controller = controller.borrow_mut();
-        if let Some(name) = evt.and_then(|e| e.name) {
+        if let Some(name) = evt.as_ref().and_then(|e| e.name.as_ref()) {
             if name.starts_with("error") {
                 controller.clear_error(&name);
             }
             if name == "mpd" {
-                controller.toggle_mpd();
+                match evt.as_ref().unwrap().button {
+                    // scroll up
+                    4 => controller.mpd_next(),
+                    // scroll down
+                    5 => controller.mpd_prev(),
+                    _ => controller.mpd_toggle()
+                }
             }
         }
         Ok(())
