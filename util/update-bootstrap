@@ -5,13 +5,40 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+if [ ! -x "`which mprime`" ]; then
+  echo "Please install mprime"
+  exit
+fi
+
+
+
 unsquashfs /mnt/arch/x86_64/airootfs.sfs
+
+err=0
+for lib in $(ldd $(which mprime) | grep '=>' | sed -r 's/.*?=> (.*?) \(.*/\1/'); do
+  if [ ! -f "squashfs-root$lib" ]; then
+    echo "Library $lib required by mprime but not available on live system"
+    err=1
+  fi
+done
+if [ "$err" = 1 ]; then
+  exit
+fi
+
+cp `which mprime` "squashfs-root`which mprime`"
+cp $(eval echo ~`logname`)/dotfiles/xorg/{.xinitrc,.Xresources} squashfs-root/root/
+
 ./squashfs-root/bin/arch-chroot squashfs-root /bin/bash << EOF
 export TERM=xterm-256color
+sed -i 's/CheckSpace/#CheckSpace/' /etc/pacman.conf
 pacman-key --init
 pacman-key --populate archlinux
 pacman-key --refresh-keys
 pacman -Syu --noconfirm
+pacman -S --noconfirm xorg-server xorg-xinit xorg-apps xf86-video-intel gparted
+# fix compinit directories
+chown -R root:root /usr/share/zsh
+chmod -R 755 /usr/share/zsh
 wget https://svn.neo-layout.org/linux/console/neo.map
 mkdir -p /usr/share/kbd/keymaps/i386/neo
 mv neo.map /usr/share/kbd/keymaps/i386/neo/
