@@ -1,0 +1,5 @@
+#!/bin/sh
+
+mkdir ~/.config/gajim/
+# gajim creates a new file when saving preferences
+cp ~/dotfiles/.config/gajim/config ~/.config/gajim/config

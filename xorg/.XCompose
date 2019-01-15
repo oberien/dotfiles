@@ -32,15 +32,33 @@ include "%H/.XCompose-neo"
 <Multi_key> <r> <e> <z>                   : "🇿" # REGIONAL INDICATOR SYMBOL LETTER Z
 
 # important stuff
-<Multi_key> <ellipsis> <asciicircum>      : "᪴" U1AB4 # COMBINING TRIPLE DOT
-<Multi_key> <s> <h> <r> <u> <g>           : "¯\\_(ツ)_/¯" # SHRUG
-<Multi_key> <h> <e> <l> <i>               : "🚁"  U1F681 # HELICOPTER
-<Multi_key> <b> <e> <e>                   : "🐝"  U1F41D # HONEYBEE
-<Multi_key> <g> <g>                       : "ΓΓ" # GG
-<Multi_key> <plus> <1>                    : "👍"  U1F44D
-<Multi_key> <plus> <KP_1>                 : "👍"  U1F44D
-<Multi_key> <colon> <D>                   : "😀"  U1F600
-<Multi_key> <colon> <o>                   : "😮"  U1F632
-<Multi_key> <colon> <O>                   : "😲"  U1F632
-<Multi_key> <2> <b>                       : "2 🐝 ∨ ¬ 2 🐝" # TO BE OR NOT TO BE
-<Multi_key> <KP_2> <b>                       : "2 🐝 ∨ ¬ 2 🐝" # TO BE OR NOT TO BE
+<Multi_key> <ellipsis> <asciicircum>              : "᪴" U1AB4 # COMBINING TRIPLE DOT
+<Multi_key> <s> <h> <r> <u> <g>                   : "¯\\_(ツ)_/¯" # SHRUG
+<Multi_key> <c> <r> <a> <b>                       : "🦀"  U1F980 # CRAB
+<Multi_key> <h> <e> <l> <i>                       : "🚁"  U1F681 # HELICOPTER
+<Multi_key> <s> <a> <t> <c> <o> <m>               : "🛰"  U1F6F0 # SATTELITE
+<Multi_key> <g> <u> <n>                           : "🔫"  U1F52B # PISTOL
+<Multi_key> <b> <e> <e>                           : "🐝"  U1F41D # HONEYBEE
+<Multi_key> <m> <o> <u> <s> <e>                   : "🐭"  U1F42D # MOUSE FACE
+<Multi_key> <c> <o> <w>                           : "🐮"  U1F42E # COW FACE
+<Multi_key> <t> <i> <g> <e> <r>                   : "🐯"  U1F42F # TIGER FACE
+<Multi_key> <r> <a> <b> <b> <i> <t>               : "🐰"  U1F430 # RABBIT FACE
+<Multi_key> <c> <a> <t>                           : "🐱"  U1F431 # CAT FACE
+<Multi_key> <s> <n> <o> <w> <m> <a> <n>           : "☃︎"  U1F431 # CAT FACE
+<Multi_key> <g> <g>                               : "ΓΓ" # GG
+<Multi_key> <plus> <1>                            : "👍"  U1F44D # THUMBS UP SIGN
+<Multi_key> <plus> <KP_1>                         : "👍"  U1F44D # THUMBS UP SIGN
+<Multi_key> <colon> <-> <parenright>              : "☺"   U263A # WHITE SMILING FACE
+<Multi_key> <colon> <-> <parenleft>               : "☹"   U2639 # WHITE FROWNING FACE
+<Multi_key> <colon> <slash>                       : "😕"  U1F615 # CONFUSED FACE
+<Multi_key> <colon> <p>                           : "😛"  U1F61B # FACE WITH STUCK-OUT TONGUE
+<Multi_key> <colon> <P>                           : "😛"  U1F61B # FACE WITH STUCK-OUT TONGUE
+<Multi_key> <semicolon> <p>                       : "😜"  U1F61B # FACE WITH STUCK-OUT TONGUE AND WINKING EYE
+<Multi_key> <semicolon> <P>                       : "😜"  U1F61B # FACE WITH STUCK-OUT TONGUE AND WINKING EYE
+<Multi_key] <semicolon> <parenright>              : "😉"  U1F609 # WINKING FACE
+<Multi_key> <colon> <d>                           : "😀"  U1F600 # GRINNING FACE
+<Multi_key> <colon> <D>                           : "😁"  U1F601 # GRINNING FACE WITH SMILING EYES
+<Multi_key> <colon> <o>                           : "😮"  U1F62E # FACE WITH OPEN MOUTH
+<Multi_key> <colon> <O>                           : "😲"  U1F632 # ASTONISHED FACE
+<Multi_key> <2> <b>                               : "2 🐝 ∨ ¬ 2 🐝" # TO BE OR NOT TO BE
+<Multi_key> <KP_2> <b>                            : "2 🐝 ∨ ¬ 2 🐝" # TO BE OR NOT TO BE

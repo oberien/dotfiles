@@ -7,3 +7,4 @@ sudo ./setup/reisub
 ./setup/dunst
 ./setup/vim
 ./setup/mpd
+./setup/gajim

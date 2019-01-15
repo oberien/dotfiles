@@ -2,4 +2,4 @@
 
 mkdir ~/.config/mpd/
 mkdir ~/.config/mpd/playlists
-ln -s ~/dotfiles/mpd/mpd.conf ~/.config/mpd/mpd.conf
+ln -s ~/dotfiles/.config/mpd/mpd.conf ~/.config/mpd/mpd.conf
