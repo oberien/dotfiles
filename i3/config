@@ -243,6 +243,7 @@ bindsym $mod+F12 exec --no-startup-id setxkbmap de neo
 bindcode --release 120 exec --no-startup-id xset dpms force standby
 
 bar {
+        tray_output primary
         #status_command i3status
         # use custom program
         status_command cd ~/.i3/bar/ && cargo run --release
