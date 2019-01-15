@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Set up an arch-linux system with encryption using an arch-boostrap image.
+# The linux and swap partitions will be encrypted with a random key.
+# That random key will be stored on an external drive like an SD card or thumb drive.
+# That external drive will be encrypted with a password.
+
+# Even though the swap partition is encrypted with a static key, hibernation
+# is not (yet) supported with these instructions, but support can be added later on.
+
 # partition variables
 BOOTPARTITION=/dev/device1
 SWAPPARTITION=/dev/device2
@@ -11,12 +19,12 @@ loadkeys de-latin1
 setfont lat9w-16
 
 # setup partitions
-# If there is already a windows installed on an msdos partition table,
-# change to gpt and recreate the windows partition with the same sections.
+# If there is a windows instance installed on an msdos partition table,
+# change to gpt and recreate the windows partition with the exact same sections.
 fdisk /dev/device
     # GPT, needed for EFI
     g
-    # boot
+    # boot (EFI)
     n
         1
         default
@@ -39,12 +47,12 @@ fdisk /dev/device
     w
 
 # crypto system
-# If no keyfile is wanted, leave out -d keyfile.
+# If no keyfile is wanted on an external drive, leave out -d keyfile.
 cryptsetup -vd keyfile_system luksFormat $SYSTEMPARTITION
 cryptsetup open -d keyfile_system $SYSTEMPARTITION system
 # crypto swap
 # If swap should not be encrypted, leave out this step.
-# If no keyfile is wanted, leave out -d keyfile. UNTESTED
+# If no keyfile is wanted on an external drive, leave out -d keyfile. UNTESTED
 cryptsetup -vd keyfile_swap luksFormat $SWAPPARTITION
 cryptsetup open -d keyfile_swap $SWAPPARTITION swap
 
@@ -53,7 +61,7 @@ cryptsetup open -d keyfile_swap $SWAPPARTITION swap
 mkfs.ext4 $SYSTEM
 mkfs.fat -F32 $BOOTPARTITION
 # swap
-# If swap was set up without cryptsetup, use $SWAPPARTITION instead of $SWAP.
+# If swap was set up without encryption, use $SWAPPARTITION instead of $SWAP.
 mkswap $SWAP
 swapon $SWAP
 
@@ -64,14 +72,20 @@ mount $BOOTPARTITION /mnt/boot
 
 
 # pacstrap
-# For a setup with wayland and swey use this instead UNTESTED
+# For a setup with wayland and sway use this instead: UNTESTED
 # pacstrap -i /mnt base base-devel git net-tools networkmanager wayland sway gnome-terminal cmake
+
 # For a setup with gnome and wayland (wayland is default for gnome).
 # Using gnome you need to have `exec gnome-session` in you .xinitrc.
 # Additionally if you want to use gdm, run `systemctl enable gdm.service` in the new system
 # pacstrap -i /mnt base base-devel zsh git net-tools networkmanager network-manager-applet gvim cmake gnome gnome-extra
+
+# For xorg and i3:
 pacstrap -i /mnt base base-devel zsh git net-tools networkmanager network-manager-applet xorg-xserver xorg-xinit xorg-apps rxvt-unicode i3 dmenu gvim cmake
+
+
 genfstab -U /mnt > /mnt/etc/fstab
+# make sure everything is correct
 cat /mnt/etc/fstab
 
 arch-chroot /mnt /bin/zsh
@@ -100,7 +114,7 @@ nano /etc/sudoers # uncomment %wheel
 # dotfiles 'n stuff
   # change user to created one
   # setup dotfiles
-  # setup paranoid_link if needed
+  # setup paranoid_link if an external drive is used to store the encryption keys
   # edit files for paranoid stuff
 
 # generate bootimage and entries
@@ -165,7 +179,7 @@ pacman -S gst-libav
 
 # useful others
 aurman -S urxvt-font-size-git
-pacman -S evince
+pacman -S zathura zathura-pdf-mupdf
 pacman -S feh
 pacman -S imagemagick
 pacman -S htop iotop
@@ -190,7 +204,10 @@ pacman -S pulseaudio
 pacman -S pavucontrol
 aurman -S pulseaudio-ctl
 pacman -S thunderbird
-pacman -S pidgin pidgin-otr
+
+# xmpp
+pacman -S gajim python-axolotl python-pillow
+# Plugins: OMEMO, Url image preview
 
 # mysql
 pacman -S mariadb
