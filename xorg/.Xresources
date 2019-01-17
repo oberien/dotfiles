@@ -114,3 +114,7 @@ URxvt.keysym.KP_9:  9
 URxvt.keysym.M-KP_9:  \0339
 URxvt.keysym.KP_0:  0
 URxvt.keysym.M-KP_0:  \0330
+
+! Ctrl+Up/Down increases/decreases font
+URxvt.keysym.C-Up:     perl:font-size:increase
+URxvt.keysym.C-Down:   perl:font-size:decrease

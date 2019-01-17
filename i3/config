@@ -202,8 +202,8 @@ mode "none" {
 bindsym $mod+Escape mode "none"
 
 # startup programs and bind to workspaces
-exec --no-startup-id i3-msg "workspace $w1; exec firefox"
-assign [class="Firefox"] → $w1
+exec --no-startup-id i3-msg "workspace $w1; exec 'firefox -P default --class firefox-default'"
+assign [class="firefox-default"] → $w1
 exec --no-startup-id i3-msg "workspace $w2; exec thunderbird"
 assign [class="Thunderbird"] → $w2
 exec --no-startup-id i3-msg "workspace $w4; exec gajim"
@@ -239,6 +239,7 @@ bindsym XF86Sleep exec --no-startup-id i3lock
 
 bindsym $mod+F11 exec --no-startup-id setxkbmap de
 bindsym $mod+F12 exec --no-startup-id setxkbmap de neo
+bindsym --release $mod+Insert exec --no-startup-id bash -c "sleep 0.2 && echo -ne '\x01' | ncat -U /run/user/1000/windows-gaming-driver/control.sock"
 
 bindcode --release 120 exec --no-startup-id xset dpms force standby
 

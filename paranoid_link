@@ -1,6 +1,6 @@
 #! /bin/sh
 
-sudo ln -s /home/morpheus/dotfiles/paranoid/hooks/lukskey /etc/initcpio/hooks/lukskey
-sudo ln -s /home/morpheus/dotfiles/paranoid/install/lukskey /etc/initcpio/install/lukskey
-sudo ln -s /home/morpheus/dotfiles/hdd /usr/local/bin/hdd
-sudo ln -s /home/morpheus/dotfiles/paranoid/mkinitcpio.conf /etc/mkinitcpio.conf
+sudo ln -s ~/dotfiles/paranoid/hooks/lukskey /etc/initcpio/hooks/lukskey
+sudo ln -s ~/dotfiles/paranoid/install/lukskey /etc/initcpio/install/lukskey
+sudo ln -s ~/dotfiles/hdd /usr/local/bin/hdd
+sudo ln -s ~/dotfiles/paranoid/mkinitcpio.conf /etc/mkinitcpio.conf
