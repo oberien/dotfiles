@@ -210,8 +210,8 @@ exec --no-startup-id i3-msg "workspace $w5; exec pavucontrol"
 assign [class="Pavucontrol"] → $w5
 exec --no-startup-id i3-msg "workspace $w5; exec franz"
 assign [class="Franz"] → $w5
-exec --no-startup-id i3-msg "workspace $w6; exec firefox"
-assign [class="Firefox"] → $w6
+exec --no-startup-id i3-msg "workspace $w1; exec 'firefox -P default --class firefox-default'"
+assign [class="firefox-default"] → $w1
 exec --no-startup-id i3-msg "workspace $w10; exec intellij-idea-ultimate-edition"
 assign [class="jetbrains-idea"] → $w10
 
@@ -232,6 +232,7 @@ bindsym F11 exec --no-startup-id mpc prev
 bindsym F12 exec --no-startup-id mpc next
 bindsym $mod+F11 exec --no-startup-id setxkbmap de
 bindsym $mod+F12 exec --no-startup-id setxkbmap de neo
+bindsym --release $mod+Insert exec --no-startup-id bash -c "sleep 0.2 && echo -ne '\x01' | ncat -U /run/user/1000/windows-gaming-driver/control.sock"
 
 bindsym XF86Sleep exec --no-startup-id i3lock
 
