@@ -1,0 +1,23 @@
+#!/bin/sh
+set -euo pipefail
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <mumble.p12>"
+  exit 1
+fi
+if [ ! -f "$1" ]; then
+  echo "Invalid input file."
+  exit 1
+fi
+
+openssl pkcs12 -in "$1" -nodes -passin pass: -nocerts -out /tmp/mumble.key
+openssl pkcs12 -in "$1" -nodes -passin pass: -nokeys -out /tmp/mumble.crt
+
+sig=`openssl x509 -in /tmp/mumble.crt -noout -fingerprint -sha1`
+
+echo "$sig"
+
+openssl pkcs12 -export -in /tmp/mumble.crt -inkey /tmp/mumble.key -out "$1"
+shred /tmp/mumble.key
+rm /tmp/mumble.key
+rm /tmp/mumble.crt
