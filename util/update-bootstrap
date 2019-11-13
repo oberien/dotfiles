@@ -7,9 +7,18 @@ fi
 
 if [ ! -x "`which mprime`" ]; then
   echo "Please install mprime"
-  exit
+  exit 1
 fi
 
+if ! mountpoint -q /mnt || [ ! -f /mnt/arch/x86_64/airootfs.sfs ]; then
+  echo "Please mount the arch-bootstrap partition at /mnt"
+  exit 2
+fi
+
+if ! mountpoint -q /boot; then
+  echo "Please mount the boot partition at /boot"
+  exit 3
+fi
 
 
 unsquashfs /mnt/arch/x86_64/airootfs.sfs
@@ -39,7 +48,7 @@ pacman -S --noconfirm xorg-server xorg-xinit xorg-apps xf86-video-intel gparted
 # fix compinit directories
 chown -R root:root /usr/share/zsh
 chmod -R 755 /usr/share/zsh
-wget https://svn.neo-layout.org/linux/console/neo.map
+wget https://neo-layout.org/svn/linux/console/neo.map
 mkdir -p /usr/share/kbd/keymaps/i386/neo
 mv neo.map /usr/share/kbd/keymaps/i386/neo/
 localectl set-keymap --no-convert de neo
