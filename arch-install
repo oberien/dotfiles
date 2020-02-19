@@ -170,6 +170,9 @@ aurman -S kbd-neo
 localectl set-keymap --no-convert de neo
 localectl set-x11-keymap --no-convert de thinkpad neo
 
+# ibus
+pacman -S ibus
+
 # notification daemon
 pacman -S dunst
 

@@ -219,6 +219,7 @@ assign [class="Steam"] → $w7
 
 exec nm-applet
 exec dunst
+exec ibus-daemon -drx
 
 # custom bindings
 

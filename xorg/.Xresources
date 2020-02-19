@@ -40,6 +40,9 @@ urxvt*boldItalicFont: xft:DejaVu Sans Mono:style=Book:antialias=false:size=10, \
 URxvt.scrollstyle: rxvt
 URxvt.scrollBar_right: true
 
+URxvt.inputMethod: ibus
+URxvt.preeditType: OverTheSpot
+
 URxvt*iso14755: False
 URxvt*iso14755_52: False
 
