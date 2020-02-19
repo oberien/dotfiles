@@ -210,10 +210,16 @@ exec --no-startup-id i3-msg "workspace $w5; exec pavucontrol"
 assign [class="Pavucontrol"] → $w5
 exec --no-startup-id i3-msg "workspace $w5; exec franz"
 assign [class="Franz"] → $w5
-exec --no-startup-id i3-msg "workspace $w1; exec 'firefox -P default --class firefox-default'"
-assign [class="firefox-default"] → $w1
+exec --no-startup-id i3-msg "workspace $w6; exec 'firefox -P default --class firefox-default'"
+assign [class="firefox-default"] → $w6
 exec --no-startup-id i3-msg "workspace $w10; exec intellij-idea-ultimate-edition"
 assign [class="jetbrains-idea"] → $w10
+
+
+exec --no-startup-id nm-applet
+exec --no-startup-id setxkbmap de-neo
+exec --no-startup-id dunst
+exec --no-startup-id sh ~/.screenlayout/dual.sh
 
 # custom bindings
 bindsym --release Print exec --no-startup-id import "/tmp/screenshot`date +'%Y%m%d%H%M%S'`.png"
@@ -245,9 +251,4 @@ bar {
         status_command cd ~/.i3/bar/ && cargo run --release
         #status_command cd ~/.i3/bar/ && RUST_BACKTRACE=1 cargo run
 }
-
-exec --no-startup-id nm-applet
-exec --no-startup-id setxkbmap de-neo
-exec --no-startup-id dunst
-exec --no-startup-id sh ~/.screenlayout/dual.sh
 
