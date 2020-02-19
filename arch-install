@@ -173,6 +173,11 @@ localectl set-x11-keymap --no-convert de thinkpad neo
 # ibus
 pacman -S ibus
 
+# plover
+pikaur -S plover-git
+sudo gpasswd -a `whoami` uucp
+# configure plover for Gemini and to start on boot
+
 # notification daemon
 pacman -S dunst
 
