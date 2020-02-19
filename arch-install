@@ -166,7 +166,7 @@ rm -rf /tmp/pikaur_install
 nano /etc/makepkg.conf
 
 # setup neo-layout
-aurman -S kbd-neo
+pikaur -S kbd-neo
 localectl set-keymap --no-convert de neo
 localectl set-x11-keymap --no-convert de thinkpad neo
 
@@ -182,12 +182,12 @@ sudo gpasswd -a `whoami` uucp
 pacman -S dunst
 
 # browser
-aurman -S vivaldi
+pikaur -S vivaldi
 pacman -S firefox
 pacman -S gst-libav
 
 # useful others
-aurman -S urxvt-font-size-git
+pikaur -S urxvt-font-size-git
 pacman -S zathura zathura-pdf-mupdf
 pacman -S feh
 pacman -S imagemagick
@@ -211,7 +211,7 @@ pacman -S ffmpeg
 pacman -S mumble
 pacman -S pulseaudio
 pacman -S pavucontrol
-aurman -S pulseaudio-ctl
+pikaur -S pulseaudio-ctl
 pacman -S thunderbird
 
 # xmpp
@@ -227,18 +227,18 @@ pacman -S dnsutils
 # steam
 # enable multilib in /etc/pacman.conf
 pacman -Syu
-aurman -S steam
+pikaur -S steam
 
 # other fonts used for games/wine/vim
-aurman -S ttf-tahoma
-aurman -S ttf-ms-fonts
-aurman -S ttf-dejavu-sans-mono-powerline-git
+pikaur -S ttf-tahoma
+pikaur -S ttf-ms-fonts
+pikaur -S ttf-dejavu-sans-mono-powerline-git
 
 # java
 pacman -S jdk8-openjdk
 pacman -S openjdk8-src
 pacman -S openjdk8-doc
-aurman -S intellij-idea-ultimate-edition
+pikaur -S intellij-idea-ultimate-edition
 
 # rust
 pacman -S rustup
