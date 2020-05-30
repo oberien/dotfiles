@@ -28,10 +28,10 @@ fdisk /dev/device
     n
         1
         default
-        +100M
+        +500M
     t
         1
-    # SWAP
+    # SWAP not necessarily needed, sometimes even counterproductive
     n
         2
         default
@@ -43,7 +43,7 @@ fdisk /dev/device
     n
         3
         default
-        +256G
+        default
     w
 
 # crypto system
@@ -56,9 +56,18 @@ cryptsetup open -d keyfile_system $SYSTEMPARTITION system
 cryptsetup -vd keyfile_swap luksFormat $SWAPPARTITION
 cryptsetup open -d keyfile_swap $SWAPPARTITION swap
 
-
-# format
+# for lvm (above use cryptsetup open with name "lvm" instead of "system")
+pvcreate /dev/mapper/lvm
+vgcreate vg_lvm /dev/mapper/lvm
+lvcreate -L 500G vg_lvm -n system /dev/mapper/lvm
+# raid1: lvcreate --type raid1 --mirrors 1 -L 200G vg_lvm -n home /dev/mapper/lvm /dev/mapper/lvm2
+lvcreate -L 200G vg_lvm -n home /dev/mapper/lvm
+# convert to raid1 later on: lvconvert --type raid1 --mirrors 1 vg_lvm/home /dev/mapper/lvm /dev/mapper/lvm2
+... others
+# for non-lvm
 mkfs.ext4 $SYSTEM
+
+# boot
 mkfs.fat -F32 $BOOTPARTITION
 # swap
 # If swap was set up without encryption, use $SWAPPARTITION instead of $SWAP.
@@ -66,6 +75,7 @@ mkswap $SWAP
 swapon $SWAP
 
 # mount everything
+# lvm: mount /dev/vg_lvm/system /mnt
 mount $SYSTEM /mnt
 mkdir /mnt/boot
 mount $BOOTPARTITION /mnt/boot
@@ -114,10 +124,12 @@ nano /etc/sudoers # uncomment %wheel
 # dotfiles 'n stuff
   # change user to created one
   # setup dotfiles
+  # if using lvm, add the "lvm2" hook after the "encrypt" hook in dotfiles/paranoid/mkinitcpio.conf
   # setup paranoid_link if an external drive is used to store the encryption keys
   # edit files for paranoid stuff
 
 # generate bootimage and entries
+# if using lvm, use cryptdevice=...:lvm root=/dev/vg_lvm/system
 mkinitcpio -p linux
 cat <<_EOF_ > /boot/loader/entries/arch.conf
 title       Arch Linux
