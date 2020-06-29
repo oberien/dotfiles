@@ -61,6 +61,7 @@ pvcreate /dev/mapper/lvm
 vgcreate vg_lvm /dev/mapper/lvm
 lvcreate -L 500G vg_lvm -n system /dev/mapper/lvm
 # raid1: lvcreate --type raid1 --mirrors 1 -L 200G vg_lvm -n home /dev/mapper/lvm /dev/mapper/lvm2
+# if raid is used, add the modules dm_raid and raid1 to /etc/mkinitcpio.conf
 lvcreate -L 200G vg_lvm -n home /dev/mapper/lvm
 # convert to raid1 later on: lvconvert --type raid1 --mirrors 1 vg_lvm/home /dev/mapper/lvm /dev/mapper/lvm2
 ... others
