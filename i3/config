@@ -198,19 +198,24 @@ bindsym $mod+Escape mode "none"
 
 # startup programs and bind to workspaces
 exec --no-startup-id i3-msg "workspace $w1; exec firefox"
-assign [class="firefox"] → $w1
+assign [class="Navigator"] → $w1
 exec --no-startup-id i3-msg "workspace $w2; exec thunderbird"
 assign [class="Thunderbird"] → $w2
-exec --no-startup-id i3-msg "workspace $w4; exec 'env GDK_SCALE=2 gajim'"
+#exec --no-startup-id i3-msg "workspace $w4; exec 'env GDK_SCALE=2 gajim'"
 assign [class="Gajim"] → $w4
+exec --no-startup-id i3-msg "workspace $w4; exec signal-large"
+assign [class="Signal"] → $w4
 exec --no-startup-id i3-msg "workspace $w5; exec pavucontrol"
 assign [class="Pavucontrol"] → $w5
 exec --no-startup-id i3-msg "workspace $w5; exec franz-large"
 assign [class="Franz"] → $w5
-exec --no-startup-id i3-msg "workspace $w5; exec signal-large"
-assign [class="Signal"] → $w4
 assign [class="Mumble"] → $w5
 assign [class="Steam"] → $w7
+assign [class="dota2"] → $w7
+#exec --no-startup-id i3-msg "workspace $w11; exec cadence"
+#assign [class="Cadence"] → $w11
+#exec --no-startup-id i3-msg "workspace $w11; exec carla ~/.config/carla/default.carxp"
+#assign [class="Carla2"] → $w11
 
 for_window [class="Florence"] floating enable
 
@@ -219,7 +224,7 @@ exec dunst
 #exec ibus-daemon -drx
 exec easystroke
 exec dmenu
-#exec albert
+#exec plover
 
 # custom bindings
 
@@ -234,7 +239,6 @@ bindsym XF86AudioPrev exec --no-startup-id mpc prev
 bindsym XF86AudioNext exec --no-startup-id mpc next
 bindsym XF86MonBrightnessDown exec --no-startup-id /usr/bin/xbacklight -dec 10
 bindsym XF86MonBrightnessUp exec --no-startup-id /usr/bin/xbacklight -inc 10
-
 
 bindsym XF86Sleep exec --no-startup-id i3lock
 
