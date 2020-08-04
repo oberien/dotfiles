@@ -5,7 +5,7 @@
 ! Xcursor.theme: Simple-and-Soft
 
 URxvt.depth: 32
-URxvt.background: rgba:0000/1800/0000/dddd
+URxvt.background: #000000
 URxvt.foreground: White
 
 !// see /usr/share/fonts/misc/fonts.alias
@@ -15,17 +15,17 @@ URxvt.foreground: White
 !pixelsize=15:antialias=true:hinting=true
 urxvt*skipBuiltinGlyphs: true
 
-urxvt*font: xft:DejaVu Sans Mono for Powerline-10:style=Book:antialias=false:size=10, \
+urxvt*font: xft:DejaVu Sans Mono for Powerline-16:style=Book:antialias=false:size=16, \
             xft:WenQuanYi Bitmap Song:size=10, \
             xft:FreeSerif:style=Regular, \
             xft:unifont:style=Medium:antialias=false, \
             xft:Symbola
 
-urxvt*boldFont: xft:DejaVu Sans Mono for Powerline-10:style=Book:antialias=false:size=10, \
+urxvt*boldFont: xft:DejaVu Sans Mono for Powerline-16:style=Book:antialias=false:size=16, \
                 xft:WenQuanYi Bitmap Song:size=10, \
                 xft:unifont:style=Medium:antialias=false
 
-urxvt*italicFont: xft:DejaVu Sans Mono for Powerline-10:style=Book:antialias=false:size=10, \
+urxvt*italicFont: xft:DejaVu Sans Mono for Powerline-16:style=Book:antialias=false:size=16, \
                   xft:WenQuanYi Bitmap Song:size=10, \
                   xft:unifont:style=Medium:antialias=false
 

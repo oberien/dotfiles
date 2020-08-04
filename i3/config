@@ -25,13 +25,14 @@ font pango:DejaVu Sans Mono 10
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec alacritty
 
 # kill focused window
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
 bindsym $mod+d exec dmenu_run
+#bindsym $mod+d exec --no-startup-id albert toggle
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -122,18 +123,12 @@ set $w16 16
 
 # switch to workspace
 bindsym $mod+1 workspace $w1
-workspace "$w1" output DP-2
 bindsym $mod+2 workspace $w2
-workspace "$w2" output DVI-I-1
 bindsym $mod+3 workspace $w3
 bindsym $mod+4 workspace $w4
-workspace "$w4" output HDMI-1
 bindsym $mod+5 workspace $w5
-workspace "$w5" output HDMI-1
 bindsym $mod+6 workspace $w6
-workspace "$w6" output DVI-I-1
 bindsym $mod+7 workspace $w7
-workspace "$w7" output DP-2
 bindsym $mod+8 workspace $w8
 bindsym $mod+9 workspace $w9
 bindsym $mod+0 workspace $w10
@@ -202,24 +197,29 @@ mode "none" {
 bindsym $mod+Escape mode "none"
 
 # startup programs and bind to workspaces
-exec --no-startup-id i3-msg "workspace $w1; exec 'firefox -P default --class firefox-default'"
-assign [class="firefox-default"] → $w1
+exec --no-startup-id i3-msg "workspace $w1; exec firefox"
+assign [class="firefox"] → $w1
 exec --no-startup-id i3-msg "workspace $w2; exec thunderbird"
 assign [class="Thunderbird"] → $w2
-exec --no-startup-id i3-msg "workspace $w4; exec gajim"
+exec --no-startup-id i3-msg "workspace $w4; exec 'env GDK_SCALE=2 gajim'"
 assign [class="Gajim"] → $w4
 exec --no-startup-id i3-msg "workspace $w5; exec pavucontrol"
-exec --no-startup-id i3-msg "workspace $w5; exec mumble"
 assign [class="Pavucontrol"] → $w5
+exec --no-startup-id i3-msg "workspace $w5; exec franz-large"
+assign [class="Franz"] → $w5
+exec --no-startup-id i3-msg "workspace $w5; exec signal-large"
+assign [class="Signal"] → $w4
 assign [class="Mumble"] → $w5
-exec --no-startup-id i3-msg "workspace $w6; exec firefox"
-assign [class="Firefox"] → $w6
-exec --no-startup-id i3-msg "workspace $w7; exec steam"
 assign [class="Steam"] → $w7
+
+for_window [class="Florence"] floating enable
 
 exec nm-applet
 exec dunst
-exec ibus-daemon -drx
+#exec ibus-daemon -drx
+exec easystroke
+exec dmenu
+#exec albert
 
 # custom bindings
 
@@ -243,12 +243,13 @@ bindsym $mod+F12 exec --no-startup-id setxkbmap de neo
 bindsym --release $mod+Insert exec --no-startup-id bash -c "sleep 0.2 && echo -ne '\x01' | ncat -U /run/user/1000/windows-gaming-driver/control.sock"
 
 bindcode --release 120 exec --no-startup-id xset dpms force standby
+#bindcode 248 exec --no-startup-id ~/dotfiles/hp_lid
 
 bar {
         tray_output primary
+        font pango:DejaVu Sans Mono 16
         #status_command i3status
         # use custom program
         status_command cd ~/.i3/bar/ && cargo run --release
         #status_command cd ~/.i3/bar/ && RUST_BACKTRACE=1 cargo run
 }
-

@@ -82,3 +82,4 @@ alias rcgoto=__rcgotofn
 
 alias rcstatus='echo -n "status\nquit" | ncat ::1 20000 | grep -E "> \( |\( " | sed -E "s/> //" | sed -E "s/\( (.*) \)/\1/"'
 alias rcinfo='echo -n "info\nquit" | ncat ::1 20000 | grep -E "\|" | sed -E "s/\| //" | sed -E "/^\|[^ ]/d"'
+alias preform='wine ~/.wine/drive_c/Program Files/Formlabs/PreForm/PreForm.exe'

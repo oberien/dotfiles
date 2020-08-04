@@ -1,6 +1,6 @@
 #!/bin/bash
 
-UUID="30a65847-0e31-4c1c-85b1-3f6c9f9ff4e1"
+UUID="8dc510f4-6bb0-4c2c-8594-d1cbecc49f91"
 DEVICE="/dev/disk/by-uuid/$UUID"
 
 run_hook() {
@@ -29,7 +29,7 @@ run_hook() {
 }
 
 run_latehook() {
-  cryptsetup open -d /keys/keyfile_swap /dev/nvme0n1p2 swap
+  cryptsetup open -d /keys/keyfile_swap /dev/nvme0n1p6 swap
   umount /keys
   cryptsetup close keys
   rm -r /keys

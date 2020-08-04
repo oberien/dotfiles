@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+wakeup=`journalctl | grep "PM: Finishing wakeup" | tail -1 | cut -d' ' -f 1,2,3`
+wakeuptime=`date --date="$wakeup" +%s`
+currtime=`date +%s`
+diff=$((currtime - wakeuptime))
+
+# logs
+echo content `cat /tmp/hp_lid` >> /tmp/hp_lid.log
+echo "wakeuptime $wakeuptime" >> /tmp/hp_lid.log
+echo "currtime   $currtime" >> /tmp/hp_lid.log
+echo "diff       $diff" >> /tmp/hp_lid.log
+
+# check if the event resulted from suspending
+if [ $diff -le 2 -o $diff -eq 14 -o $diff -eq 4 -o $diff -eq 17 -o $diff -eq 16 -o $diff -eq 18 ];
+then
+  echo "just woke up, ignore event" >> /tmp/hp_lid.log
+  exit
+fi
+
+# update lid file
+if [ ! -f /tmp/hp_lid ];
+then
+  echo false > /tmp/hp_lid
+fi
+
+if `cat /tmp/hp_lid`;
+then
+  killall onboard
+  echo false > /tmp/hp_lid
+else
+  onboard &
+  echo true > /tmp/hp_lid
+fi

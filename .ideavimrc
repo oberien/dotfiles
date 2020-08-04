@@ -3,3 +3,4 @@ source ~/.vimrc
 :map t<Right> :action NextTab<CR>
 :map t<Left> :action PreviousTab<CR>
 :map \c<Space> :action CommentByLineComment<CR>
+set multiple-cursors
