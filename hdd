@@ -78,7 +78,10 @@ fi
 
 if [ "$1" = "mount" ]
   then
-    if [ "$2" = "ssd" ]
+    if [ "$2" = "keys" ]
+      then
+        setup
+    elif [ "$2" = "ssd" ]
       then
         mntssd
     elif [ "$2" = "hdd" ]
@@ -87,7 +90,10 @@ if [ "$1" = "mount" ]
     fi
 elif [ "$1" = "umount" ]
   then
-    if [ "$2" = "ssd" ]
+    if [ "$2" = "keys" ]
+      then
+        cleanup
+    elif [ "$2" = "ssd" ]
       then
         umntssd
     elif [ "$2" = "hdd" ]
