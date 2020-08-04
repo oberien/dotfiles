@@ -5,8 +5,12 @@ CRYPTDEVICE="/dev/disk/by-uuid/$CRYPTUUID"
 
 HDDUUID="8ede4b72-d3e2-43a0-b707-58a16110766f"
 HDDDEVICE="/dev/disk/by-uuid/$HDDUUID"
+HDDUUID2="f8680863-867c-4a5d-bcb1-a29dc4cd36ef"
+HDDDEVICE2="/dev/disk/by-uuid/$HDDUUID2"
+HDDUUID3="d97c881d-f8d5-4ebd-b6dd-26e508f26a50"
+HDDDEVICE3="/dev/disk/by-uuid/$HDDUUID3"
 
-SSDUUID="4b98f446-c5df-46f9-8861-282b40f2dceb"
+SSDUUID="8dc510f4-6bb0-4c2c-8594-d1cbecc49f91"
 SSDDEVICE="/dev/disk/by-uuid/$SSDUUID"
 
 setup() {
@@ -44,6 +48,19 @@ mnthdd() {
   cleanup
 }
 
+mntfilme() {
+  setup
+
+  if [ ! -e /Filme ]
+    then
+      mkdir /Filme
+  fi
+  cryptsetup open -d /keys/keyfile_hdd $HDDDEVICE3 filme
+  mount /dev/mapper/filme /Filme
+
+  cleanup
+}
+
 mntssd() {
   setup
 
@@ -62,6 +79,11 @@ mntssd() {
 umnthdd() {
   umount /hdd
   cryptsetup close hdd
+}
+
+umntfilme() {
+  umount /Filme
+  cryptsetup close filme
 }
 
 umntssd() {
@@ -87,6 +109,9 @@ if [ "$1" = "mount" ]
     elif [ "$2" = "hdd" ]
       then
         mnthdd
+    elif [ "$2" = "filme" ]
+      then
+        mntfilme
     fi
 elif [ "$1" = "umount" ]
   then
@@ -99,6 +124,9 @@ elif [ "$1" = "umount" ]
     elif [ "$2" = "hdd" ]
       then
         umnthdd
+    elif [ "$2" = "filme" ]
+      then
+        umntfilme
     fi
 else
     echo "Wrong command -- only accept ['mount', 'umount']"
