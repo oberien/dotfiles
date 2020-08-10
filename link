@@ -3,6 +3,7 @@
 ./setup/zsh
 ./setup/i3
 ./setup/xorg
+./setup/alacritty
 sudo ./setup/reisub
 ./setup/dunst
 ./setup/vim
