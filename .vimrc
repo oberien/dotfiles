@@ -50,6 +50,8 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'tpope/vim-dispatch'
 " autocomplete with <tab>
 Bundle 'ervandew/supertab'
+" grammar check with LanguageTool
+Bundle 'rhysd/vim-grammarous'
 
 " languages
 " coffeescript
@@ -93,7 +95,11 @@ set expandtab
 "set statusline+=%{SyntasticStatuslineFlag()}
 "set statusline+=%*
 
+" 80 column highlight + wrapping
 set colorcolumn=80
+set breakindent
+set showbreak=".."
+set breakindentopt=sbr
 
 "syntastic
 let g:syntastic_always_populate_loc_list = 1
@@ -269,6 +275,9 @@ inoremap <C-l><Down> <Esc>:m .+1<CR>==gi
 inoremap <C-l><Up> <Esc>:m .-2<CR>==gi
 vnoremap <C-l><Down> :m '>+1<CR>gv=gv
 vnoremap <C-l><Up> :m '<-2<CR>gv=gv
+
+" grammar check
+nnoremap <g><c> :GrammarousCheck<CR>
 
 set history=200
 "set nocursorline

@@ -103,16 +103,16 @@ bindsym $mod+a focus parent
 mouse_warping none
 
 # define workspace names
-set $w1 1: web
+set $w1 1
 set $w2 2: mail
-set $w3 3: skype
+set $w3 3
 set $w4 4: xmpp
 set $w5 5: p+m
 set $w6 6: ff
-set $w7 7: steam
+set $w7 7
 set $w8 8
 set $w9 9
-set $w10 10
+set $w10 10: idea
 set $w11 11
 set $w12 12
 set $w13 13
@@ -122,21 +122,21 @@ set $w16 16
 
 # switch to workspace
 bindsym $mod+1 workspace $w1
-workspace "$w1" output DP-2
+workspace "$w1" output HDMI1
 bindsym $mod+2 workspace $w2
-workspace "$w2" output DVI-I-1
+workspace "$w2" output HDMI1
 bindsym $mod+3 workspace $w3
 bindsym $mod+4 workspace $w4
-workspace "$w4" output HDMI-1
+workspace "$w4" output HDMI1
 bindsym $mod+5 workspace $w5
-workspace "$w5" output HDMI-1
+workspace "$w5" output HDMI1
 bindsym $mod+6 workspace $w6
-workspace "$w6" output DVI-I-1
+workspace "$w6" output HDMI1
 bindsym $mod+7 workspace $w7
-workspace "$w7" output DP-2
 bindsym $mod+8 workspace $w8
 bindsym $mod+9 workspace $w9
 bindsym $mod+0 workspace $w10
+workspace "$w10" output HDMI2
 bindsym $mod+F1 workspace $w11
 bindsym $mod+F2 workspace $w12
 bindsym $mod+F3 workspace $w13
@@ -202,26 +202,20 @@ mode "none" {
 bindsym $mod+Escape mode "none"
 
 # startup programs and bind to workspaces
-exec --no-startup-id i3-msg "workspace $w1; exec firefox"
-assign [class="Firefox"] → $w1
 exec --no-startup-id i3-msg "workspace $w2; exec thunderbird"
 assign [class="Thunderbird"] → $w2
 exec --no-startup-id i3-msg "workspace $w4; exec gajim"
 assign [class="Gajim"] → $w4
 exec --no-startup-id i3-msg "workspace $w5; exec pavucontrol"
-exec --no-startup-id i3-msg "workspace $w5; exec mumble"
 assign [class="Pavucontrol"] → $w5
-assign [class="Mumble"] → $w5
+exec --no-startup-id i3-msg "workspace $w5; exec franz"
+assign [class="Franz"] → $w5
 exec --no-startup-id i3-msg "workspace $w6; exec firefox"
 assign [class="Firefox"] → $w6
-exec --no-startup-id i3-msg "workspace $w7; exec steam"
-assign [class="Steam"] → $w7
-
-exec nm-applet
-exec dunst
+exec --no-startup-id i3-msg "workspace $w10; exec intellij-idea-ultimate-edition"
+assign [class="jetbrains-idea"] → $w10
 
 # custom bindings
-
 bindsym --release Print exec --no-startup-id import "/tmp/screenshot`date +'%Y%m%d%H%M%S'`.png"
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id /usr/bin/pulseaudio-ctl up 3
@@ -233,12 +227,13 @@ bindsym XF86AudioPrev exec --no-startup-id mpc prev
 bindsym XF86AudioNext exec --no-startup-id mpc next
 bindsym XF86MonBrightnessDown exec --no-startup-id /usr/bin/xbacklight -dec 10
 bindsym XF86MonBrightnessUp exec --no-startup-id /usr/bin/xbacklight -inc 10
-
-
-bindsym XF86Sleep exec --no-startup-id i3lock
-
+bindsym F10 exec --no-startup-id mpc toggle
+bindsym F11 exec --no-startup-id mpc prev
+bindsym F12 exec --no-startup-id mpc next
 bindsym $mod+F11 exec --no-startup-id setxkbmap de
 bindsym $mod+F12 exec --no-startup-id setxkbmap de neo
+
+bindsym XF86Sleep exec --no-startup-id i3lock
 
 bindcode --release 120 exec --no-startup-id xset dpms force standby
 
@@ -249,4 +244,9 @@ bar {
         status_command cd ~/.i3/bar/ && cargo run --release
         #status_command cd ~/.i3/bar/ && RUST_BACKTRACE=1 cargo run
 }
+
+exec --no-startup-id nm-applet
+exec --no-startup-id setxkbmap de-neo
+exec --no-startup-id dunst
+exec --no-startup-id sh ~/.screenlayout/dual.sh
 

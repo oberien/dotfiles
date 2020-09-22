@@ -323,3 +323,6 @@ RPROMPT="%3v%4v%{$reset_color%}[%{$fg[yellow]%}%?%{$reset_color%}]%1v%{$fg[blue]
 
 #source /usr/share/nvm/init-nvm.sh
 #nvm use stable
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/bin/vault vault
