@@ -39,6 +39,7 @@ cp $(eval echo ~`logname`)/dotfiles/xorg/{.xinitrc,.Xresources} squashfs-root/ro
 
 ./squashfs-root/bin/arch-chroot squashfs-root /bin/bash << EOF
 export TERM=xterm-256color
+mkdir -p /root/.i3/log
 sed -i 's/CheckSpace/#CheckSpace/' /etc/pacman.conf
 pacman-key --init
 pacman-key --populate archlinux
