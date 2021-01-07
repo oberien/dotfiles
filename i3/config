@@ -25,7 +25,8 @@ font pango:DejaVu Sans Mono 10
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec alacritty
+#bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec urxvt -e /usr/bin/nu
 
 # kill focused window
 bindsym $mod+Shift+q kill
