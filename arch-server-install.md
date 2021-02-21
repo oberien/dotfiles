@@ -50,6 +50,39 @@ with the new one in there (if the old hostname is used in there).
 
 ## User Management
 
+There are two ways to approach user management:
+1. Only have a single root user.
+2. Have a locked root user and another user which executes root commands with `sudo`.
+
+There isn't really any advantage of one over the other if the account is used
+for administrative tasks.
+Having another user which needs to use sudo for everything fells like a chore.
+We'll present the setup for both below.
+
+### Only use root
+
+* set up ssh(d) as described in another section
+* if `ssh-copy-id` isn't working, manually copy over the `id_servername.pub`
+  content into the server's `/root/.ssh/authorized_keys`
+
+If there is another unprivileged user, delete it:
+```sh
+userdel -r <user>
+```
+
+Disable non-ssh login as the root user
+WARNING: This disables login via a physical shell.
+If you can't login via ssh, you're locked out.
+In that case, you'll need to access the system from recovery or via `init=/bin/sh`.
+```
+# lock the root account
+passwd -l root
+# scramble root password
+usermod -p '!' root
+```
+
+### Locked root and Separate user
+
 If there is no unprivileged user yet (only root), you need to create one:
 ```sh
 useradd -m -g users -G sudo,wheel,storage,power -s /bin/bash newusername
@@ -107,10 +140,16 @@ _EOF_
 
 Edit the file `/etc/ssh/sshd_config` and add / uncomment / modify the following settings:
 ```
-LogLevel VERBOSE
-PermitRootLogin no
+# if using only root
+PermitRootLogin prohibit-password
+# if using separate account
+#PermitRootLogin no
 PasswordAuthentication no
 ```
 
-Then restart `sshd` with `systemctl restart sshd`.
+While keeping one session open, restart `sshd` with `systemctl restart sshd`.
+Test if you can log in (using the ssh-key).
+If not, fix it with the still open session.
+If the open session dies while you can't establish a new one, you'll need
+to get a physical shell.
 
