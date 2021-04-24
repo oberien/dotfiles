@@ -141,6 +141,7 @@ workspace "$w10" output DP-4
 bindsym $mod+F1 workspace $w11
 workspace "$w11" output DVI-D-0
 bindsym $mod+F2 workspace $w12
+workspace "$w12" output DP-1
 bindsym $mod+F3 workspace $w13
 bindsym $mod+F4 workspace $w14
 bindsym $mod+F5 workspace $w15
@@ -206,6 +207,10 @@ bindsym $mod+Escape mode "none"
 # startup programs and bind to workspaces
 exec --no-startup-id i3-msg "workspace $w1; exec firefox -P youtube --class youtube"
 assign [class="Navigator" class="youtube"] → $w1
+exec --no-startup-id i3-msg "workspace $w6; exec firefox -P default --class default"
+assign [class="Navigator" class="default"] → $w6
+exec --no-startup-id i3-msg "workspace $w12; exec firefox -P music --class music"
+assign [class="Navigator" class="music"] → $w12
 exec --no-startup-id i3-msg "workspace $w2; exec thunderbird"
 assign [class="Thunderbird"] → $w2
 #exec --no-startup-id i3-msg "workspace $w4; exec gajim"
@@ -218,20 +223,22 @@ exec --no-startup-id i3-msg "workspace $w5; exec franz"
 exec --no-startup-id i3-msg "workspace $w5; exec mumble"
 assign [class="Mumble"] → $w5
 assign [class="Franz"] → $w5
-exec --no-startup-id i3-msg "workspace $w6; exec firefox -P default --class default"
-assign [class="Navigator" class="default"] → $w6
 exec --no-startup-id i3-msg "workspace $w7; exec steam"
 assign [class="Steam"] → $w7
 assign [class="dota2"] → $w7
+exec --no-startup-id "killall -9 jackdbus"
 exec --no-startup-id i3-msg "workspace $w11; exec cadence"
 assign [class="Cadence"] → $w11
 exec --no-startup-id i3-msg "workspace $w11; exec carla ~/.config/carla/default.carxp"
 assign [class="Carla2"] → $w11
 
+for_window [class="Florence"] floating enable
+
 exec --no-startup-id ~/.screenlayout/trio.sh
 exec nm-applet
 exec dunst
 exec ibus-daemon -drx
+#exec easystroke
 exec plover
 
 # custom bindings

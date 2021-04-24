@@ -51,12 +51,12 @@ mnthdd() {
 mntfilme() {
   setup
 
-  if [ ! -e /Filme ]
+  if [ ! -e /Filme2 ]
     then
-      mkdir /Filme
+      mkdir /Filme2
   fi
   cryptsetup open -d /keys/keyfile_hdd $HDDDEVICE3 filme
-  mount /dev/mapper/filme /Filme
+  mount /dev/mapper/filme /Filme2
 
   cleanup
 }
@@ -82,7 +82,7 @@ umnthdd() {
 }
 
 umntfilme() {
-  umount /Filme
+  umount /Filme2
   cryptsetup close filme
 }
 
@@ -131,5 +131,4 @@ elif [ "$1" = "umount" ]
 else
     echo "Wrong command -- only accept ['mount', 'umount']"
 fi
-
 

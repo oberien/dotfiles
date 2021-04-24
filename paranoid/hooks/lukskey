@@ -32,10 +32,10 @@ run_hook() {
   mount /dev/mapper/keys /keys
   #ln -s /keys/keyfile_lvm /crypto_keyfile.bin
   echo "opening lvm..."
-  cryptsetup open -d /keys/keyfile_lvm /dev/nvme1n1p2 lvm
+  cryptsetup open -d /keys/keyfile_lvm /dev/disk/by-id/nvme-Samsung_SSD_970_PRO_1TB_S462NF0MA02155D-part2 lvm
   echo "lvm opened"
   echo "opening lvm2..."
-  cryptsetup open -d /keys/keyfile_lvm2_512G /dev/nvme0n1p1 lvm2
+  cryptsetup open -d /keys/keyfile_lvm2_512G /dev/disk/by-id/nvme-Samsung_SSD_950_PRO_512GB_S2GMNCAH106143Z-part1 lvm2
   echo "lvm2 opened"
 }
 
