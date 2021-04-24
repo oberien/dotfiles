@@ -189,6 +189,11 @@ localectl set-x11-keymap --no-convert de thinkpad neo
 
 # ibus
 pacman -S ibus
+# if not there add `exec ibus-daemon -drx` to your i3-config
+# if not there, add the following lines to `/etc/environment`
+GTK_IM_MODULE=ibus
+QT_IM_MODULE=ibus
+XMODIFIERS=@im=ibus
 
 # plover
 pikaur -S plover-git
