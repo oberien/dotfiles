@@ -153,6 +153,7 @@ _EOF_
 
 # alacritty, nushell, delta
 pacman -S alacritty
+pikaur -S xcwd
 pikaur -S nushell-git # use https://github.com/oberien/nushell.git for now until #2296 is merged
 pikaur -S git-delta-bin
 
