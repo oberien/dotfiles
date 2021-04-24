@@ -222,7 +222,7 @@ for_window [class="Florence"] floating enable
 
 exec nm-applet
 exec dunst
-#exec ibus-daemon -drx
+exec ibus-daemon -drx
 exec easystroke
 exec dmenu
 #exec plover
