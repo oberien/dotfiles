@@ -153,6 +153,7 @@ _EOF_
 
 # alacritty, nushell, delta
 pacman -S alacritty
+pikaur -S xcwd
 pikaur -S nushell-git # use https://github.com/oberien/nushell.git for now until #2296 is merged
 pikaur -S git-delta-bin
 
@@ -189,6 +190,11 @@ localectl set-x11-keymap --no-convert de thinkpad neo
 
 # ibus
 pacman -S ibus
+# if not there add `exec ibus-daemon -drx` to your i3-config
+# if not there, add the following lines to `/etc/environment`
+GTK_IM_MODULE=ibus
+QT_IM_MODULE=ibus
+XMODIFIERS=@im=ibus
 
 # plover
 pikaur -S plover-git

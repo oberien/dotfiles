@@ -4,5 +4,5 @@ ln -s ~/dotfiles/xorg/.xinitrc ~/.xinitrc
 ln -s ~/dotfiles/xorg/.Xresources ~/.Xresources
 sudo ln -s ~/dotfiles/xorg/10-monitor.conf /etc/X11/xorg.conf.d/10-monitor.conf
 wget http://www.neo-layout.org/XCompose -O ~/.XCompose-neo
+ln -s ~/dotfiles/xorg/.XCompose-dead ~/.XCompose-dead
 ln -s ~/dotfiles/xorg/.XCompose ~/.XCompose
-sudo ln -s ~/dotfiles/xorg/im.sh /etc/profile.d/im.sh
