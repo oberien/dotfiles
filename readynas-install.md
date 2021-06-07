@@ -269,7 +269,7 @@ host mail.gmx.net
 port 587
 from foo@gmx.de
 user foo@gmx.de
-password ...
+passwordeval "cat /root/.ssh/msmtp-gmx-password"
 set_from_header on
 undisclosed_recipients on
 
