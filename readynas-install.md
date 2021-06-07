@@ -98,13 +98,17 @@ Install Debian:
     * `apt install --reinstall grub-efi-amd64`
     * `efibootmgr -c -d /dev/sdc -L debian0 -l '\EFI\debian\grubx64.efi'`
     * `efibootmgr -c -d /dev/sdd -L debian1 -l '\EFI\debian\grubx64.efi'`
-* it may be necessary to manually create the `/etc/fstab`
+* update (or if needed manually create) the `/etc/fstab`
 ```
-# / (/etc/md1)
-UUID=... /               ext4    errors=remount-ro 0       1
-# /boot/efi (/etc/md127)
-UUID=...  /boot/efi       vfat    umask=0077      0       1
+# / (/dev/md1)
+UUID=... /               ext4    errors=panic 0       1
+# /boot/efi (/dev/md127)
+UUID=...  /boot/efi       vfat    errors=remount-ro,umask=0077      0       1
 ```
+* edit `/etc/sysctl.conf`
+    ```
+    kernel.panic = 10
+    ```
 * if you want, update from stable to testing
     * edit `/etc/apt/sources.list`:
     ```
@@ -126,6 +130,8 @@ UUID=...  /boot/efi       vfat    umask=0077      0       1
         * `apt install gnupg`
         * `apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys <key>`
     * `apt autoremove`
+* in BIOS in Boot options, disable everything except the two RAID1 boot partition entries
+    * also disable the UEFI console, as it'll run anyway one no other boot device was found
 
 #### Set up server, ssh etc
 
