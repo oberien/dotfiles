@@ -195,10 +195,16 @@ systemctl status cron
 SMB (no CI) (fast)
 ```
 apt install samba
+# disable sharing homes by commenting out the `[homes]` section
+vim /etc/samba/smb.conf
 zfs set sharesmb=on tank/data
+zfs share tank/data
 smbpasswd -a root
+# test if sharing worked
+smbclient -U guest -N -L localhost
 
 # mount on client
+pacman -S samba
 mount -t cifs //10.x.x.x/tank_data /data -o user=root,password=...,gid=1000,uid=1000,_netdev,x-systemd.automount,x-systemd.mount-timeout=1min
 ```
 
