@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -x
+
+for f in $@; do
+  mogrify -strip "$f"
+  jhead -purejpg "$f"
+  exiftool -all= -overwrite_original "$f"
+done
