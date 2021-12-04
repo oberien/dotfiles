@@ -169,6 +169,43 @@ To send HDDs to sleep after 5min, in `/etc/hdparm.conf` for each HDD add
 }
 ```
 
+#### Configure Network
+
+Single LAN connection (`/etc/network/interfaces`):
+```
+source /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+
+allow-hotplug enp2s0f0
+allow-hotplug enp2s0f1
+allow-hotplug enp3s0f0
+allow-hotplug enp3s0f1
+iface enp2s0f0 inet manual
+iface enp2s0f1 inet manual
+iface enp3s0f0 inet dhcp
+iface enp3s0f1 inet manual
+```
+
+LAG with LACP (requires LAG / LACP supporting switch) (`/etc/network/interfaces`):
+```
+source /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+
+# Link Aggregation / LAG / 802.3ad
+auto bond0
+
+iface bond0 inet dhcp
+    bond-slaves enp2s0f0 enp2s0f1 enp3s0f0 enp3s0f1
+    bond-miimon 100
+    bond-downdelay 200
+    bond-updelay 200
+```
+reboot
+
 #### Setup ZFS
 
 ```
@@ -219,6 +256,19 @@ pacman -S nfs-utils
 mount -t nfs4 10.x.x.x:/data /data
 ```
 
+#### Backup (to external HDD)
+Prepare backup HDD
+```
+zpool create -O mountpoint=none -O encryption=aes-256-gcm -O keyformat=passphrase -O pbkdf2iters=10000000 backup /dev/disk/by-id/... #external hdd
+```
+Full backup (with re-encryption)
+```
+zfs snapshot -r tank/data@YYYY-MM-DD
+zfs send -Rcw tank/data@YYYY-MM-DD | zfs receive backup
+```
+
+#### Backup (to remote ZFS pool)
+
 #### DLNA
 
 ```
@@ -228,6 +278,29 @@ vim /etc/minidlna.conf
 systemctl enable minidlna
 systemctl start minidlna
 ```
+
+#### nginx and Let's Encrypt
+
+```
+apt install nginx python3-certbot-nginx
+```
+
+* general nginx file structure:
+    * `/etc/nginx/nginx.conf` contains global config which are the same for every server
+    * `/etc/nginx/sites-available/` contains configs for each server respectively
+    * `/etc/nginx/sites-enabled/` contains symlinks to `sites-available/...`
+* test setup:
+    * remove `sites-enabled/default`
+    * set up test site under location `/test` partially following <https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-debian-10>
+    * test config with `nginx -t`
+    * apply with `systemctl reload nginx`
+    * for connection reset: `return 444;`
+    * set up server config following <https://nginx.org/en/docs/beginners_guide.html>
+* let's encrypt + ssl:
+    * set up ssl parameters following <https://wiki.mozilla.org/Security/Server_Side_TLS>
+    * `certbot --nginx -d your_domain`
+    * ensure proper configuration of `/etc/cron.d/certbot`
+
 
 #### Nextcloud
 
