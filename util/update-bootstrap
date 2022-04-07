@@ -9,6 +9,10 @@ if [ ! -x "`which mprime`" ]; then
   echo "Please install mprime"
   exit 1
 fi
+if [ ! -x "`which unsquashfs`" ]; then
+  echo "Please install squashfs-tools"
+  exit 1
+fi
 
 if ! mountpoint -q /mnt || [ ! -f /mnt/arch/x86_64/airootfs.sfs ]; then
   echo "Please mount the arch-bootstrap partition at /mnt"
