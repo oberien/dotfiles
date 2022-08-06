@@ -1,5 +1,111 @@
 #!/bin/bash
 
+# Encryption Setup:
+# * Attacker Model: https://md.statshelix.com/kVCPl8VFSnm69WH504T-0g
+# * General Idea:
+#     * boot-partition on a USB-stick
+#     * keyfiles on the same USB-stick
+#     * (live archiso on the same USB-stick)
+#     * keyfiles parition encrypted with LUKS using a memorized password
+# * OPAL:
+#     * use the SSDs SED (self-encrypting drive) functionality
+#     * faster than LUKS if the SSD exceeds ~2.5GB/s
+#     * has a data key to encrypt all data with
+#     * has authentication keys to encrypt data key with
+# * LUKS:
+#     * use software encryption to encrypt drives or partitions
+#     * slower as encryption is done in the CPU instead of on the drive itself
+#     * has a data key to encrypt all data with
+#     * has authentication keys to encrypt data key with
+
+
+# Background: Boot Steps
+# * CPU init (e.g. Intel Management Engine)
+#     * very small initial binary blob which gets executed when the CPU is powered on
+#     * performs small initial checks
+# * POST
+#     * Power-on self-test
+#     * checks and tests hardware
+#     * e.g. memory-training if required
+# * UEFI (BIOS with MBR is outdated; UEFI is better in every regard)
+#     * initializes the hardware including switching to 64bit
+#     * reads boot entries from NVRAM to find registered EFI binaries
+#     * e.g. a disk: looks for an EFI system partition on the disk and loads `\EFI\BOOT\BOOTx64.EFI` from it
+#     * firmware launches the EFI application
+# * Bootmanager
+#     * usually the EFI application is a bootmanager like grub or gummiboot / systemd-boot
+#     * shows different systems / options to switch from
+#     * once selected, chain-loads that option's efi application
+#     * can be skipped in favour of direcly launching the bootloader (seldomly used in the wild)
+# * Bootloader (initramfs)
+#     * the bootmanager usually loads the bootloader
+#     * on linux usually initramfs
+#     * loads initial linux hardware drivers
+#     * initializes hardware for use with linux
+#     * decrypts and mounts partitions
+#     * loads the kernel and hands over execution to it
+#     * instead of initramfs, linux supports an EFISTUB with which the kernel
+#       can directly be loaded without initramfs
+# * Kernel
+#     * sets up everything, starts systemd with all its services
+#     * starts userland
+# * Userland
+#     * login interface
+#     * everything else
+
+
+# Boot Setup with Encryption:
+# * initramfs LUKS single disk:
+#     * contains hooks which are executed one after another
+#     * we add a hook after `keyboard` and `keymap` before `encrypt`
+#     * our hook unlocks the keyfiles-partition
+#     * links the correct keyfile to `/crypto_keyfile.bin`
+#     * kernel parameters: `cryptdevice=...:system root=/dev/mapper/system`
+#     * `encrypt` hook uses `/crypto_keyfile.bin` to decrypt the kernel parameter `cryptdevice`
+#     * Advantages:
+#         * "simple" setup
+#         * works surprisingly well out of the box
+#     * Disadvantages:
+#         * boot partition unecrypted -> must reside on USB-Stick
+#         * boot partition needs to be mounted on every system update
+#         * -> one USB-stick per device is required
+# * initramfs LVM in LUKS on multiple disks:
+#     * our hook unlocks the keyfiles-partition
+#     * runs cryptsetup for each disk to-be-decrypted using the keyfiles
+#     * kernel parameters: `root=/dev/vg_lvm/system`
+#     * same advantages / disadvantages as initramfs LUKS single disk
+# * grub CRYPTODISK shim:
+#     * UNTESTED
+#     * grub allows having a grub shim which decrypts the boot partition
+#     * the decrypted boot partition contains the initramfs
+#     * Advantages:
+#         * same grub-shim for all devices
+#         * USB-stick doesn't need to be connected and mounted during every system update
+#         * -> same USB-stick for all devices
+#     * Disadvantages:
+#         * complex
+#         * only works with LUKS1
+#         * might not work with opal(?)
+#         * might not be possible to dynamically switch between opal setup and
+#           LUKS setup depending on the system it's connected to
+#         * might need modifications to work
+#         * if modifications need to be made to grub, why not write an own bootloader?
+# * custom PBA (pre-boot authenticator) / UEFI bootloader (opal-uefi-greeter):
+#     * custom bootloader / bootmanager / bootmenu
+#     * custom EFI binary
+#     * decrypt keyfile partition
+#     * checks if there are any OPAL-locked SEDs
+#     * if yes: decrypt them using keyfiles and chain-load initramfs
+#     * if not: decrypt LUKS drives using keyfiles and chain-load initramfs
+#     * Advantages:
+#         * fancy
+#         * full control
+#         * can have any and every feature wanted
+#     * Disadvantages:
+#         * not an easy general-purpose solution
+#         * most complex of the solutions
+
+
 # Set up an arch-linux system with encryption using an arch-boostrap image.
 # The linux and swap partitions will be encrypted with a random key.
 # That random key will be stored on an external drive like an SD card or thumb drive.
@@ -19,8 +125,9 @@ loadkeys de-latin1
 setfont lat9w-16
 
 # setup partitions
-# If there is a windows instance installed on an msdos partition table,
-# change to gpt and recreate the windows partition with the exact same sections.
+# If there is a windows instance installed on an msdos partition table, and for
+# whatever reason actually want to keep that winodws,
+# change to gpt and recreate the windows partition with the exact same sectors.
 fdisk /dev/device
     # GPT, needed for EFI
     g
