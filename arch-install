@@ -7,11 +7,13 @@
 #     * keyfiles on the same USB-stick
 #     * (live archiso on the same USB-stick)
 #     * keyfiles parition encrypted with LUKS using a memorized password
+#     * even though the swap partition is encrypted with a static key, hibernation
+#       is not (yet) supported with these instructions, but support can be added later on.
 # * OPAL:
 #     * use the SSDs SED (self-encrypting drive) functionality
 #     * faster than LUKS if the SSD exceeds ~2.5GB/s
 #     * has a data key to encrypt all data with
-#     * has authentication keys to encrypt data key with
+#     * has an authentication key to encrypt data key with
 # * LUKS:
 #     * use software encryption to encrypt drives or partitions
 #     * slower as encryption is done in the CPU instead of on the drive itself
@@ -23,35 +25,38 @@
 # * CPU init (e.g. Intel Management Engine)
 #     * very small initial binary blob which gets executed when the CPU is powered on
 #     * performs small initial checks
-# * POST
-#     * Power-on self-test
+# * Firmware
+#     * POST: Power-on self-test
 #     * checks and tests hardware
 #     * e.g. memory-training if required
-# * UEFI (BIOS with MBR is outdated; UEFI is better in every regard)
 #     * initializes the hardware including switching to 64bit
+#     * loads low-level device drivers
+# * UEFI
+#     * (technically just an interface to communicate with the firmware;
+#       the firmware still does all these steps)
 #     * reads boot entries from NVRAM to find registered EFI binaries
-#     * e.g. a disk: looks for an EFI system partition on the disk and loads `\EFI\BOOT\BOOTx64.EFI` from it
-#     * firmware launches the EFI application
-# * Bootmanager
-#     * usually the EFI application is a bootmanager like grub or gummiboot / systemd-boot
-#     * shows different systems / options to switch from
-#     * once selected, chain-loads that option's efi application
-#     * can be skipped in favour of direcly launching the bootloader (seldomly used in the wild)
-# * Bootloader (initramfs)
-#     * the bootmanager usually loads the bootloader
-#     * on linux usually initramfs
+#     * scans disks to find EFI System Partitions
+#     * loads the first configured available option
+#     * if it's an EFI binary boot entry, loads it
+#     * if it's a disk: looks for an EFI system partition on the disk and loads `\EFI\BOOT\BOOTx64.EFI`
+#     * launches the EFI application
+# * Bootmanager / Bootloader
+#     * usually the just loaded EFI application is a bootmanager like grub or gummiboot / systemd-boot
+#     * shows different systems / options to select from
+#     * once selected, loads that option's efi application
+#     * in case of the kernel also loads the initramfs
+#     * "packages" the kernel-efi (vmlinuz) and initramfs in-memory
+#     * loads the kernel-initramfs-packaged efi
+#     * can be skipped in favour of direcly launching the kernel (e.g. EFISTUB with Secure Boot)
+# * Kernel
 #     * loads initial linux hardware drivers
 #     * initializes hardware for use with linux
 #     * decrypts and mounts partitions
-#     * loads the kernel and hands over execution to it
-#     * instead of initramfs, linux supports an EFISTUB with which the kernel
-#       can directly be loaded without initramfs
-# * Kernel
-#     * sets up everything, starts systemd with all its services
-#     * starts userland
-# * Userland
-#     * login interface
-#     * everything else
+#     * runs init-binary as PID 1 (default /bin/init)
+# * Init / Userland
+#     * /bin/init is usually systemd
+#     * starts all its services
+#     * starts everything else, possibly including XServer (XOrg or Wayland)
 
 
 # Boot Setup with Encryption:
@@ -106,13 +111,7 @@
 #         * most complex of the solutions
 
 
-# Set up an arch-linux system with encryption using an arch-boostrap image.
-# The linux and swap partitions will be encrypted with a random key.
-# That random key will be stored on an external drive like an SD card or thumb drive.
-# That external drive will be encrypted with a password.
-
-# Even though the swap partition is encrypted with a static key, hibernation
-# is not (yet) supported with these instructions, but support can be added later on.
+# This "guide" assumes you have an arch-boostrap image.
 
 # partition variables
 BOOTPARTITION=/dev/device1
@@ -153,11 +152,52 @@ fdisk /dev/device
         default
     w
 
-# crypto system
+# Encryption using OPAL (for LUKS see below)
+
+sedutil-cli --scan
+sedutil-cli --query /dev/nvmeX
+linuxpba # password `debug`
+# if you're lucky and the drive supports SED, it should say "is OPAL NOT LOCKED"
+# If you're unlucky, it says "not OPAL".
+# In that case either your SSD is too old to support OPAL, or you are even more unlucky.
+# You may have just gotten an SSD that supports Pyrite instead of OPAL.
+# Now you can be really really fucking sad, go into a corner and cry.
+# Trusted Computing Group: "Unlike Opalite SSC, Pyrite SSC does not specify encryption of user data."
+
+# Regenerate data encryption key: PSID reset / crypto erase
+# You need the PSID, which is printed on the sticker on the SSD.
+# ProTip™: there may be a data-matrix code with the PSID (which doesn't really help
+# because you're going to type it on the archiso live system but whatever ¯\_(ツ)_/¯)
+sedutil-cli --yesIreallywanttoERASEALLmydatausingthePSID <psid> /dev/nvmeX
+# should output: `revertTper completed successfully`
+
+sedutil-cli --initialsetup debug /dev/nvmeX
+sedutil-cli --enablelockingrange 0 debug /dev/nvmeX
+sedutil-cli --setlockingrange 0 lk debug /dev/nvmeX
+sedutil-cli --setmbrdone off debug /dev/nvmeX
+# OPAL supports that the SSD shows some data when it is not encrypted.
+# This can be used to have a PBA on the SDD's MBR.
+# When the PC powers on, it sees the PBA EFI binary, loads and executes it,
+# which unlocks the drive and reboots.
+# As the SSD hasn't lost power, it will stay unlocked.
+# After the reboot, the BIOS now sees the actual boot partition and boots Linux.
+# The setup in this "guide" stores the PBA on a separate USB-stick, so this
+# feature isn't needed.
+sedutil-cli --setmbrenable off debug /dev/nvmeX
+# test with linuxpba
+linuxpba # password `debug`
+# should output: `is OPAL Unlocked`
+
+
+# Encryption using LUKS
+
+# generate random keys
+dd if=/dev/urandom of=keyfile_system bs=4096 count=1
+dd if=/dev/urandom of=keyfile_swap bs=4096 count=1
+
 # If no keyfile is wanted on an external drive, leave out -d keyfile.
 cryptsetup -vd keyfile_system luksFormat $SYSTEMPARTITION
 cryptsetup open -d keyfile_system $SYSTEMPARTITION system
-# crypto swap
 # If swap should not be encrypted, leave out this step.
 # If no keyfile is wanted on an external drive, leave out -d keyfile. UNTESTED
 cryptsetup -vd keyfile_swap luksFormat $SWAPPARTITION
