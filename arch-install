@@ -48,6 +48,8 @@
 #     * "packages" the kernel-efi (vmlinuz) and initramfs in-memory
 #     * loads the kernel-initramfs-packaged efi
 #     * can be skipped in favour of direcly launching the kernel (e.g. EFISTUB with Secure Boot)
+#     * the default vmlinuz-linux is also an EFI stub, which tries to load `initramfs-linux.img`
+#       from the same partition if the initramfs doesn's yet exist
 # * Kernel
 #     * loads initial linux hardware drivers
 #     * initializes hardware for use with linux
