@@ -30,41 +30,69 @@
 #     * checks and tests hardware
 #     * e.g. memory-training if required
 #     * initializes the hardware including switching to 64bit
-#     * loads low-level device drivers
+#     * loads and provides low-level device drivers
 # * UEFI
 #     * (technically just an interface to communicate with the firmware;
 #       the firmware still does all these steps)
 #     * reads boot entries from NVRAM to find registered EFI binaries
 #     * scans disks to find EFI System Partitions
 #     * loads the first configured available option
-#     * if it's an EFI binary boot entry, loads it
-#     * if it's a disk: looks for an EFI system partition on the disk and loads `\EFI\BOOT\BOOTx64.EFI`
+#     * if it's an EFI binary boot entry: load it
+#     * if it's a disk: look for an EFI system partition on the disk and load `\EFI\BOOT\BOOTx64.EFI`
 #     * launches the EFI application
 # * Bootmanager / Bootloader
-#     * usually the just loaded EFI application is a bootmanager like grub or gummiboot / systemd-boot
+#     * usually that EFI application is a bootmanager like grub or gummiboot / systemd-boot
 #     * shows different systems / options to select from
 #     * once selected, loads that option's efi application
-#     * in case of the kernel also loads the initramfs
-#     * "packages" the kernel-efi (vmlinuz) and initramfs in-memory
-#     * loads the kernel-initramfs-packaged efi
-#     * can be skipped in favour of direcly launching the kernel (e.g. EFISTUB with Secure Boot)
-#     * the default vmlinuz-linux is also an EFI stub, which tries to load `initramfs-linux.img`
-#       from the same partition if the initramfs doesn's yet exist
+#     * let's assume a linux kernel from now on
+#     * `vmlinuz-linux` is the compressed kernel (indicated by the z)
+#     * `vmlinuz-linux` contains an EFISTUB to make the kernel an efi application
+#     * in case of old MBR-style loading:
+#         * unpacks the kernel
+#         * stores it at a specific address
+#         * loads the initramfs
+#         * stores it at a specific address
+#         * creates and initializes a boot config struct at a specific address
+#         * jumps to a specific address within the kernel
+#         * kernel starts executing code from there
+#     * in case of EFISTUB:
+#         * load and execute the kernel as an efi binary
+#         * -> run its EFISTUB
+#     * bootloader can be skipped in favour of direcly launching the kernel's  EFISTUB
+# * EFISTUB
+#     * load initramfs
+#         * if files are passed via commandline using `initrd=/foo/bar`,
+#           load those from the same partition as the EFISTUB and merge them
+#         * if there is an embedded initramfs in the kernel image, load it
+#         * if there is neither an initrd parameter nor an embedded initramfs
+#           check the `initrdmem=phys_ptr,size` parameter and load the initramfs from there
+#     * unpack the initramfs into memory
+#     * mount the unpacked initramfs as `/`
+#     * exit_boot_services (stop UEFI boot state)
+#     * load the kernel
 # * Kernel
 #     * loads initial linux hardware drivers
 #     * initializes hardware for use with linux
+#     * starts `/init` as PID 1
+# * /init
+#     * runs the hooks declared in `/etc/mkinitcpio.conf`
+#     * e.g. loads mods
 #     * decrypts and mounts partitions
-#     * runs init-binary as PID 1 (default /bin/init)
-# * Init / Userland
-#     * /bin/init is usually systemd
+#     * checks the `root=/dev/xxx` kernel parameter and mounts it as `/new_root`
+#     * executes `pivot_root` to switch the rootfs from the initramfs to `/new_root`
+#     * executes `/bin/init` as PID 1
+# * /bin/init
+#     * ususally systemd
+#     * analyses the dependency graph of all services
 #     * starts all its services
 #     * starts everything else, possibly including XServer (XOrg or Wayland)
 
 
 # Boot Setup with Encryption:
-# * initramfs LUKS single disk:
+# * initramfs LUKS single disk with `encrypt` hook:
 #     * contains hooks which are executed one after another
-#     * we add a hook after `keyboard` and `keymap` before `encrypt`
+#     * we add a hook after `keyboard` and `keymap` (to init our usb-keyboard)
+#       before `encrypt` (which decrypts `cryptdevice`)
 #     * our hook unlocks the keyfiles-partition
 #     * links the correct keyfile to `/crypto_keyfile.bin`
 #     * kernel parameters: `cryptdevice=...:system root=/dev/mapper/system`
@@ -76,32 +104,37 @@
 #         * boot partition unecrypted -> must reside on USB-Stick
 #         * boot partition needs to be mounted on every system update
 #         * -> one USB-stick per device is required
+#         * supports only a single encrypted disk with the root partition
+# * initramfs LUKS single disk with `sd-encrypt` hook:
+#     * similar to `encryt` hook, but supports multiple cryptdevices via /etc/crypttab.initramfs
+#     * similar advantages and disadvantages
 # * initramfs LVM in LUKS on multiple disks:
 #     * our hook unlocks the keyfiles-partition
 #     * runs cryptsetup for each disk to-be-decrypted using the keyfiles
 #     * kernel parameters: `root=/dev/vg_lvm/system`
-#     * same advantages / disadvantages as initramfs LUKS single disk
+#     * same advantages / disadvantages as initramfs LUKS
 # * grub CRYPTODISK shim:
 #     * UNTESTED
-#     * grub allows having a grub shim which decrypts the boot partition
-#     * the decrypted boot partition contains the initramfs
+#     * grub supports multi-stage, where stage 1 decrypts the boot partition
+#     * stage 1 loads stage 2 from the now decrypted boot partition
+#     * stage 2 starts kernel
 #     * Advantages:
-#         * same grub-shim for all devices
+#         * same grub stage 1 for all devices
 #         * USB-stick doesn't need to be connected and mounted during every system update
 #         * -> same USB-stick for all devices
 #     * Disadvantages:
 #         * complex
-#         * only works with LUKS1
+#         * only works with LUKS1 (a patched grub with partial LUKS2 support exists)
 #         * might not work with opal(?)
 #         * might not be possible to dynamically switch between opal setup and
 #           LUKS setup depending on the system it's connected to
 #         * might need modifications to work
-#         * if modifications need to be made to grub, why not write an own bootloader?
+#         * if modifications need to be made to grub, why not write a custom bootloader?
 # * custom PBA (pre-boot authenticator) / UEFI bootloader (opal-uefi-greeter):
 #     * custom bootloader / bootmanager / bootmenu
 #     * custom EFI binary
 #     * decrypt keyfile partition
-#     * checks if there are any OPAL-locked SEDs
+#     * check if there are any OPAL-locked SEDs
 #     * if yes: decrypt them using keyfiles and chain-load initramfs
 #     * if not: decrypt LUKS drives using keyfiles and chain-load initramfs
 #     * Advantages:
