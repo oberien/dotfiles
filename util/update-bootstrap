@@ -1,17 +1,9 @@
-#!/bin/bash -ex
+#!/bin/bash -eux
+set -o pipefail
 
 if [ "$EUID" -ne 0 ]; then
   echo "Run as root"
   exit
-fi
-
-if [ ! -x "`which mprime`" ]; then
-  echo "Please install mprime"
-  exit 1
-fi
-if [ ! -x "`which unsquashfs`" ]; then
-  echo "Please install squashfs-tools"
-  exit 1
 fi
 
 if ! mountpoint -q /mnt || [ ! -f /mnt/arch/x86_64/airootfs.sfs ]; then
@@ -27,35 +19,48 @@ fi
 
 unsquashfs /mnt/arch/x86_64/airootfs.sfs
 
-err=0
-for lib in $(ldd $(which mprime) | grep '=>' | sed -r 's/.*?=> (.*?) \(.*/\1/'); do
-  if [ ! -f "squashfs-root$lib" ]; then
-    echo "Library $lib required by mprime but not available on live system"
-    err=1
+install_binary_with_libraries() {
+  if [ ! -x "`which $1`" ]; then
+    echo "Please install $1"
+    exit 1
   fi
-done
-if [ "$err" = 1 ]; then
-  exit
-fi
 
-cp `which mprime` "squashfs-root`which mprime`"
+  err=0
+  for lib in $(ldd $(which $1) | grep '=>' | sed -r 's/.*?=> (.*?) \(.*/\1/'); do
+    if [ ! -f "squashfs-root$lib" ]; then
+      echo "Library $lib required by $1 but not available on live system"
+      err=1
+    fi
+  done
+  if [ "$err" = 1 ]; then
+    exit
+  fi
+
+  cp `which $1` "squashfs-root`which $1`"
+}
+
+install_binary_with_libraries mprime
+install_binary_with_libraries sedutil-cli
+install_binary_with_libraries linuxpba
+
 cp $(eval echo ~`logname`)/dotfiles/xorg/{.xinitrc,.Xresources} squashfs-root/root/
 
-./squashfs-root/bin/arch-chroot squashfs-root /bin/bash << EOF
+./squashfs-root/bin/arch-chroot squashfs-root /bin/bash << "EOF" || true
+set -euo pipefail
 export TERM=xterm-256color
-sed -i 's/CheckSpace/#CheckSpace/' /etc/pacman.conf
+mkdir -p /root/.i3/log
+sed -i 's/^CheckSpace/#CheckSpace/' /etc/pacman.conf
 pacman-key --init
 pacman-key --populate archlinux
 pacman-key --refresh-keys
+pacman -Sy --noconfirm
+pacman -S --noconfirm archlinux-keyring
 pacman -Syu --noconfirm
-pacman -S --noconfirm xorg-server xorg-xinit xorg-apps xf86-video-intel gparted
+pacman -S --noconfirm --needed xorg-server xorg-xinit xorg-apps xf86-video-intel gparted kdiskmark rxvt-unicode
 # fix compinit directories
 chown -R root:root /usr/share/zsh
 chmod -R 755 /usr/share/zsh
-wget https://neo-layout.org/svn/linux/console/neo.map
-mkdir -p /usr/share/kbd/keymaps/i386/neo
-mv neo.map /usr/share/kbd/keymaps/i386/neo/
-localectl set-keymap --no-convert de neo
+grep loadkeys /root/.zshrc || echo loadkeys neo >> /root/.zshrc
 mkinitcpio -p linux
 LANG=C pacman -Sl | awk '/\[installed\]$/ {print $1 "/" $2 "-" $3}' > /pkglist.txt
 yes | pacman -Scc
