@@ -6,18 +6,12 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
-if ! mountpoint -q /mnt || [ ! -f /mnt/arch/x86_64/airootfs.sfs ]; then
-  echo "Please mount the arch-bootstrap partition at /mnt"
+if ! mountpoint -q /mnt || [ ! -f /mnt/archiso/x86_64/airootfs.sfs ]; then
+  echo "Please mount the boot partition at /mnt"
   exit 2
 fi
 
-if ! mountpoint -q /boot; then
-  echo "Please mount the boot partition at /boot"
-  exit 3
-fi
-
-
-unsquashfs /mnt/arch/x86_64/airootfs.sfs
+unsquashfs /mnt/archiso/x86_64/airootfs.sfs
 
 install_binary_with_libraries() {
   if [ ! -x "`which $1`" ]; then
@@ -61,16 +55,18 @@ pacman -S --noconfirm --needed xorg-server xorg-xinit xorg-apps xf86-video-intel
 chown -R root:root /usr/share/zsh
 chmod -R 755 /usr/share/zsh
 grep loadkeys /root/.zshrc || echo loadkeys neo >> /root/.zshrc
+echo KEYMAP=neo > /etc/vconsole.conf
+echo FONT=lat9w-16 >> /etc/vconsole.conf
 mkinitcpio -p linux
 LANG=C pacman -Sl | awk '/\[installed\]$/ {print $1 "/" $2 "-" $3}' > /pkglist.txt
 yes | pacman -Scc
 exit
 EOF
-cp squashfs-root/boot/vmlinuz-linux /boot/arch/boot/x86_64/vmlinuz
-cp squashfs-root/boot/initramfs-linux.img /boot/arch/boot/x86_64/archiso.img
-mv squashfs-root/pkglist.txt /mnt/arch/pkglist.x86_64.txt
+cp squashfs-root/boot/vmlinuz-linux /mnt/archiso/boot/x86_64/vmlinuz-linux
+cp squashfs-root/boot/initramfs-linux.img /mnt/archiso/boot/x86_64/initramfs-linux.img
+mv squashfs-root/pkglist.txt /mnt/archiso/pkglist.x86_64.txt
 mksquashfs squashfs-root airootfs.sys
-mv airootfs.sys /mnt/arch/x86_64/airootfs.sfs
-md5sum /mnt/arch/x86_64/airootfs.sfs > /mnt/arch/x86_64/airootfs.md5
+mv airootfs.sys /mnt/archiso/x86_64/airootfs.sfs
+sha512sum /mnt/archiso/x86_64/airootfs.sfs > /mnt/archiso/x86_64/airootfs.sha512
 rm -r squashfs-root
 sync
