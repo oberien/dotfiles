@@ -148,6 +148,74 @@
 
 # This "guide" assumes you have an arch-boostrap image.
 
+# With OPAL, encryption must be set up before partitions.
+# With LUKS, first partitions should be set up before applying LUKS to one partition.
+
+# Encryption using OPAL
+
+sedutil-cli --scan
+sedutil-cli --query /dev/nvmeX
+linuxpba # password `debug`
+# if you're lucky and the drive supports SED, it should say "is OPAL NOT LOCKED"
+# If you're unlucky, it says "not OPAL".
+# In that case either your SSD is too old to support OPAL, or you are even more unlucky.
+# You may have just gotten an SSD that supports Pyrite instead of OPAL.
+# Now you can be really really fucking sad, go into a corner and cry.
+# Trusted Computing Group: "Unlike Opalite SSC, Pyrite SSC does not specify encryption of user data."
+
+# Regenerate data encryption key: PSID reset / crypto erase
+# You need the PSID, which is printed on the sticker on the SSD.
+# ProTip™: there may be a data-matrix code with the PSID (which doesn't really help
+# because you're going to type it on the archiso live system but whatever ¯\_(ツ)_/¯)
+sedutil-cli --PSIDrevert <psid> /dev/nvmeX
+# should output: `revertTper completed successfully`
+
+sedutil-cli --initialsetup debug /dev/nvmeX
+sedutil-cli --enablelockingrange 0 debug /dev/nvmeX
+sedutil-cli --setlockingrange 0 lk debug /dev/nvmeX
+# OPAL supports that the SSD shows some data when it is not encrypted.
+# This can be used to have a PBA on the SDD's MBR.
+# When the PC powers on, it sees the PBA EFI binary, loads and executes it,
+# which unlocks the drive and reboots.
+# As the SSD hasn't lost power, it will stay unlocked.
+# After the reboot, the BIOS now sees the actual boot partition and boots Linux.
+# The setup here unlocks the SSD with a bootloader on a separate USB-stick,
+# so this feature isn't needed.
+sedutil-cli --setmbrdone on debug /dev/nvmeX
+sedutil-cli --setmbrenable off debug /dev/nvmeX
+# check settings
+sedutil-cli --query /dev/nvmeX
+# test with linuxpba
+linuxpba # password `debug`
+# should output: `is OPAL Unlocked`
+# check settings again; should now say `Locked = N, LockingEnabled = Y`
+sedutil-cli --query /dev/nvmeX
+# set actual password
+# password, i.e. no keyfile:
+sedutil-cli --setsidpassword debug <realpassword> /dev/nvmeX
+sedutil-cli --setadmin1pwd debug <realpassword> /dev/nvmeX
+# If you want to use a keyfile, generate one with exactly 32 bytes e.g. with
+# `dd if=/dev/urandom of=/keys/keyfile_opal bs=32 count=1`.
+# THIS WON'T WORK WITH linuxpba. IF YOU WANT TO USE linuxpba, USE A PASSWORD.
+# Print it in hex using `xxd /keys/keyfile_opal` and verify its length of 32 bytes.
+# MAKE SURE THAT IT DOESN'T CONTAIN ANY ZERO-BYTE 00!
+# As we can't pass the old password PBKDF2'd and the new password raw, but only
+# either both raw or both PBKDF2'd, we need to reset the above test and restart.
+sedutil-cli --revertnoerase debug /dev/nvmeX
+sedutil-cli --reverttper debug /dev/nvmeX
+# Now do the same steps as above until excluding linuxpba
+# using `-n` and passing the hex-encoded keyfile-content.
+sedutil-cli -n --initiasetup $'\xAA\xBB\xCC...' /dev/nvmeX
+# ...
+
+# reboot and make sure the drive can be unlocked correctly
+
+# There might be a problem with suspend if the platform cuts power to the ssd
+# when suspending to mem. sedutil-sleep (a fork) might be of help, but I
+# didn't encounter this problem with my laptop as the firmware seems to keep
+# the ssd powered during suspend-to-ram.
+
+
 # partition variables
 BOOTPARTITION=/dev/device1
 SWAPPARTITION=/dev/device2
@@ -160,8 +228,10 @@ setfont lat9w-16
 
 # setup partitions
 # If there is a windows instance installed on an msdos partition table, and for
-# whatever reason actually want to keep that winodws,
+# whatever reason you actually want to keep that winodws,
 # change to gpt and recreate the windows partition with the exact same sectors.
+#
+# If using OPAL, boot isn't needed.
 fdisk /dev/device
     # GPT, needed for EFI
     g
@@ -187,46 +257,12 @@ fdisk /dev/device
         default
     w
 
-# Encryption using OPAL (for LUKS see below)
-
-sedutil-cli --scan
-sedutil-cli --query /dev/nvmeX
-linuxpba # password `debug`
-# if you're lucky and the drive supports SED, it should say "is OPAL NOT LOCKED"
-# If you're unlucky, it says "not OPAL".
-# In that case either your SSD is too old to support OPAL, or you are even more unlucky.
-# You may have just gotten an SSD that supports Pyrite instead of OPAL.
-# Now you can be really really fucking sad, go into a corner and cry.
-# Trusted Computing Group: "Unlike Opalite SSC, Pyrite SSC does not specify encryption of user data."
-
-# Regenerate data encryption key: PSID reset / crypto erase
-# You need the PSID, which is printed on the sticker on the SSD.
-# ProTip™: there may be a data-matrix code with the PSID (which doesn't really help
-# because you're going to type it on the archiso live system but whatever ¯\_(ツ)_/¯)
-sedutil-cli --yesIreallywanttoERASEALLmydatausingthePSID <psid> /dev/nvmeX
-# should output: `revertTper completed successfully`
-
-sedutil-cli --initialsetup debug /dev/nvmeX
-sedutil-cli --enablelockingrange 0 debug /dev/nvmeX
-sedutil-cli --setlockingrange 0 lk debug /dev/nvmeX
-sedutil-cli --setmbrdone off debug /dev/nvmeX
-# OPAL supports that the SSD shows some data when it is not encrypted.
-# This can be used to have a PBA on the SDD's MBR.
-# When the PC powers on, it sees the PBA EFI binary, loads and executes it,
-# which unlocks the drive and reboots.
-# As the SSD hasn't lost power, it will stay unlocked.
-# After the reboot, the BIOS now sees the actual boot partition and boots Linux.
-# The setup in this "guide" stores the PBA on a separate USB-stick, so this
-# feature isn't needed.
-sedutil-cli --setmbrenable off debug /dev/nvmeX
-# test with linuxpba
-linuxpba # password `debug`
-# should output: `is OPAL Unlocked`
-
 
 # Encryption using LUKS
 
-# generate random keys
+# If using lvm, use name "lvm" instead of "system" below
+
+# generate random keys for keyfiles
 dd if=/dev/urandom of=keyfile_system bs=4096 count=1
 dd if=/dev/urandom of=keyfile_swap bs=4096 count=1
 
@@ -247,9 +283,11 @@ lvcreate -L 500G vg_lvm -n system /dev/mapper/lvm
 lvcreate -L 200G vg_lvm -n home /dev/mapper/lvm
 # convert to raid1 later on: lvconvert --type raid1 --mirrors 1 vg_lvm/home /dev/mapper/lvm /dev/mapper/lvm2
 ... others
-# for non-lvm
-mkfs.ext4 $SYSTEM
 
+
+# Filesystems
+
+mkfs.ext4 $SYSTEM
 # boot
 mkfs.fat -F32 $BOOTPARTITION
 # swap
@@ -257,29 +295,36 @@ mkfs.fat -F32 $BOOTPARTITION
 mkswap $SWAP
 swapon $SWAP
 
+
+# Actual Installation
+
 # mount everything
 # lvm: mount /dev/vg_lvm/system /mnt
 mount $SYSTEM /mnt
+# skip if not using a boot-partition
 mkdir /mnt/boot
 mount $BOOTPARTITION /mnt/boot
 
 
-# pacstrap
-# For a setup with wayland and sway use this instead: UNTESTED
-# pacstrap -i /mnt base base-devel git net-tools networkmanager wayland sway gnome-terminal cmake
-
-# For a setup with gnome and wayland (wayland is default for gnome).
+# UNTESTED: For a setup with wayland and sway install
+# `wayland sway xorg-xwayland swaylock swaybg dmenu i3status acpilight` instead of the `i3 xorg-*` packages.
+# `sudo gpasswd -a NAME video`
+# UNTESTED: For a setup with gnome and wayland install
+# `gnome gnome-extra` instead of the `i3 xorg-*` packages.
 # Using gnome you need to have `exec gnome-session` in you .xinitrc.
-# Additionally if you want to use gdm, run `systemctl enable gdm.service` in the new system
-# pacstrap -i /mnt base base-devel zsh git net-tools networkmanager network-manager-applet gvim cmake gnome gnome-extra
-
-# For xorg and i3:
-pacstrap -i /mnt base base-devel zsh git net-tools networkmanager network-manager-applet xorg-xserver xorg-xinit xorg-apps rxvt-unicode i3 dmenu gvim cmake
+# For xorg and i3 use the below.
+pacstrap -i /mnt base base-devel linux-zen linux-zen-headers linux-firmware zsh git net-tools networkmanager network-manager-applet xorg-xserver xorg-xinit xorg-apps rxvt-unicode i3 dmenu gvim cmake
 
 
 genfstab -U /mnt > /mnt/etc/fstab
 # make sure everything is correct
-cat /mnt/etc/fstab
+# add the following:
+# # /tmp as ramdisk
+# tmpram    /tmp    tmpfs    defaults    0 0
+#
+# # /home/<user>/Downloads as ramdisk
+# downloadram    /home/<user>/Downloads    tmpfs    defaults    0 0
+vim /mnt/etc/fstab
 
 arch-chroot /mnt /bin/zsh
 
@@ -295,12 +340,13 @@ hwclock --systohc --utc
 echo myhostname > /etc/hostname
 nano /etc/hosts # add 'myhostname' to end of each line
 
-# setup boot
+# setup boot if not using custom bootloader
 bootctl install
 bootctl update
 
 # create user
 useradd NAME -m -g users -G wheel -s /bin/zsh 
+passwd NAME
 nano /etc/sudoers # uncomment %wheel
 # Using the group sudo may work as well (@main--), but I only had success with wheel.
 
@@ -312,11 +358,13 @@ nano /etc/sudoers # uncomment %wheel
   # edit files for paranoid stuff
 
 # generate bootimage and entries
+mkinitcpio -p linux-zen
 # if using lvm, use cryptdevice=...:lvm root=/dev/vg_lvm/system
-mkinitcpio -p linux
+# if using custom bootloader, do what is needed
 cat <<_EOF_ > /boot/loader/entries/arch.conf
 title       Arch Linux
 linux       /vmlinuz-linux
+initrd      /intel-ucode.img # or amd-ucode
 initrd      /initramfs-linux.img
 options     cryptdevice=$SYSTEMPARTITION:system root=$SYSTEM
 _EOF_
@@ -333,22 +381,6 @@ cat <<_EOF_ > /boot/loader/entries/windows.conf
 title Windows
 _EOF_
 
-# alacritty, nushell, delta
-pacman -S alacritty
-pikaur -S xcwd
-pikaur -S nushell-git # use https://github.com/oberien/nushell.git for now until #2296 is merged
-pikaur -S git-delta-bin
-
-# important packets
-pacman -S python3
-pacman -S python2
-pacman -S arandr
-pacman -S ttf-dejavu
-pacman -S ttf-symbola
-pacman -S wget
-pacman -S openssh
-pacman -S openvpn
-
 # pikaur instead of aurman, because aurman became weird after a few updates
 # aurman instead of pacaur, because pacaur is ded since pacman 5.1.0
 # pacaur instead of yaourt, because it's secure™
@@ -361,14 +393,32 @@ makepkg PKGBUILD --install --needed
 popd
 rm -rf /tmp/pikaur_install
 
+pacman -S intel-ucode amd-ucode
+
+# alacritty, nushell, delta
+pacman -S alacritty
+pikaur -S xcwd # when using XOrg
+pikaur -S nushell-git # use https://github.com/oberien/nushell.git for now until #2296 is merged
+pikaur -S git-delta-bin
+
+# important packets
+pacman -S python3
+pacman -S python2
+pacman -S arandr
+pacman -S ttf-dejavu
+pikaur -S ttf-symbola
+pacman -S wget
+pacman -S openssh
+pacman -S openvpn
+
+
 # make aur builds faster
 # add `MAKEFLAGS="-j$(nproc)"`
 nano /etc/makepkg.conf
 
 # setup neo-layout
-pikaur -S kbd-neo
-localectl set-keymap --no-convert de neo
-localectl set-x11-keymap --no-convert de thinkpad neo
+localectl set-keymap --no-convert neo
+localectl set-x11-keymap --no-convert neo
 
 # ibus
 pacman -S ibus
@@ -414,18 +464,25 @@ pacman -S mpv
 # others
 pacman -S ffmpeg
 pacman -S mumble
-pacman -S pulseaudio
 pacman -S pavucontrol
 pikaur -S pulseaudio-ctl
 pacman -S thunderbird
 
-# jack / sound
+# enable multilib in /etc/pacman.conf
+pacman -Syu
+
+# Sound
 pacman -S realtime-privileges
 gpasswd -a $USER realtime
-pacman -S cadence carla
-pacman -S jack2 lib32-jack2
-pacman -S pulseaudio-jack
+pacman -S lsp-plugins
+# pulse
+pacman -S pulseaudio
+# jack
+pacman -S cadence carla jack2 lib32-jack2 pulseaudio-jack
 # comment out the `Exec=`-line in /usr/share/dbus-1/services/org.jackaudio.service
+# pipewire
+pacman -S easyeffects lib32-pipewire lib32-pipewire-jack pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber carla
+# sof-firmware might be needed if the sof driver is used (lspci -v)
 
 # obs / webcam
 pacman -S obs-studio
@@ -445,8 +502,6 @@ mysql_secure_installation
 pacman -S dnsutils
 
 # steam
-# enable multilib in /etc/pacman.conf
-pacman -Syu
 pikaur -S steam
 
 # other fonts used for games/wine/vim
@@ -458,7 +513,7 @@ pikaur -S ttf-dejavu-sans-mono-powerline-git
 pacman -S jdk8-openjdk
 pacman -S openjdk8-src
 pacman -S openjdk8-doc
-pikaur -S intellij-idea-ultimate-edition
+pikaur -S intellij-idea-ultimate-edition intellij-idea-ultimate-edition-jre
 
 # rust
 pacman -S rustup
