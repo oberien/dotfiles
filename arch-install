@@ -307,13 +307,13 @@ mount $BOOTPARTITION /mnt/boot
 
 
 # UNTESTED: For a setup with wayland and sway install
-# `wayland sway xorg-xwayland swaylock swaybg dmenu i3status acpilight` instead of the `i3 xorg-*` packages.
+# `wayland sway xorg-xwayland swaylock swayidle swaybg dmenu i3status acpilight` instead of the `i3 xorg-*` packages.
 # `sudo gpasswd -a NAME video`
 # UNTESTED: For a setup with gnome and wayland install
 # `gnome gnome-extra` instead of the `i3 xorg-*` packages.
 # Using gnome you need to have `exec gnome-session` in you .xinitrc.
 # For xorg and i3 use the below.
-pacstrap -i /mnt base base-devel linux-zen linux-zen-headers linux-firmware zsh git net-tools networkmanager network-manager-applet xorg-xserver xorg-xinit xorg-apps rxvt-unicode i3 dmenu gvim cmake
+pacstrap -i /mnt base base-devel linux-zen linux-zen-headers linux-firmware zsh git net-tools inetutils xorg-xserver xorg-xinit xorg-apps rxvt-unicode i3 dmenu gvim cmake
 
 
 genfstab -U /mnt > /mnt/etc/fstab
@@ -395,6 +395,15 @@ rm -rf /tmp/pikaur_install
 
 pacman -S intel-ucode amd-ucode
 
+# graphics drivers including hwdec
+pacman -S libva-utils glxinfo
+# amd
+pacman -S mesa lib32-mesa xf86-video-amdgpu vulkan-radeon lib32-vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver mesa-vdpau lib32-mesa-vdpau
+# intel
+pacman -S mesa lib32-mesa xf86-video-intel vulkan-intel intel-media-driver 
+# nvidia
+pacman -S nvidia nvidia-utils lib32-nvidia-utils
+
 # alacritty, nushell, delta
 pacman -S alacritty
 pikaur -S xcwd # when using XOrg
@@ -411,6 +420,8 @@ pacman -S wget
 pacman -S openssh
 pacman -S openvpn
 
+# screenshots on wayland
+pacman -S wl-copy slurp grim jq
 
 # make aur builds faster
 # add `MAKEFLAGS="-j$(nproc)"`
@@ -419,6 +430,23 @@ nano /etc/makepkg.conf
 # setup neo-layout
 localectl set-keymap --no-convert neo
 localectl set-x11-keymap --no-convert neo
+
+# network
+systemctl enable systemd-resolved
+systemctl start systemd-resolved
+# LAN - configure in /etc/systemd/{network.conf,network/*}
+systemctl enable systemd-networkd
+systemctl start systemd-networkd
+# WLAN
+pacman -S iwd dhcpcd
+pikaur -S iwgtk
+systemctl enable iwd dhcpcd
+systemctl start iwd dhcpcd
+
+# ntp
+pacman -S ntp
+systemctl enable ntpd
+systemctl start ntpd
 
 # ibus
 pacman -S ibus
@@ -450,9 +478,12 @@ pacman -S htop iotop
 pacman -S unzip
 pacman -S nmap
 pacman -S mlocate
+pacman -S fd
+pacman -S ripgrep
 pacman -S gedit
 pacman -S tree
 pacman -S dosfstools
+pacman -S squashfs-tools
 pacman -S ntfs-3g
 pacman -S ncdu
 
