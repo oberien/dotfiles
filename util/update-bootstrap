@@ -57,7 +57,7 @@ pacman-key --refresh-keys
 pacman -Sy --noconfirm
 pacman -S --noconfirm archlinux-keyring
 pacman -Syu --noconfirm
-pacman -S --noconfirm --needed base-devel xorg-server xorg-xinit xorg-apps xf86-video-intel gparted kdiskmark rxvt-unicode wget rustup git curl
+pacman -S --noconfirm --needed base-devel xorg-server xorg-xinit xorg-apps xf86-video-amdgpu xf86-video-ati xf86-video-fbdev xf86-video-intel xf86-video-nouveau xf86-video-vesa gparted kdiskmark rxvt-unicode wget rustup git curl
 rustup install stable nightly
 # fix compinit directories
 chown -R root:root /usr/share/zsh
