@@ -109,21 +109,8 @@ UUID=...  /boot/efi       vfat    errors=remount-ro,umask=0077      0       1
     ```
     kernel.panic = 10
     ```
-* if you want, update from stable to testing
-    * edit `/etc/apt/sources.list`:
-    ```
-    deb http://deb.debian.org/debian/ bullseye main contrib non-free
-    deb-src http://deb.debian.org/debian/ bullseye main contrib non-free
-
-    deb http://security.debian.org/ bullseye-security main contrib non-free
-    deb-src http://security.debian.org/ bullseye-security main contrib non-free
-
-    # bullseye-updates, previously known as 'volatile'
-    deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free
-    deb-src http://deb.debian.org/debian/ bullseye-updates main contrib non-free
-
-    deb http://apt.jurisic.org/debian/ bullseye main contrib non-free
-    ```
+* update debian version
+    * edit `/etc/apt/sources.list` and replace your current version with the new version
     * `apt update`
     * `apt dist-upgrade` (possibly multiple times)
         * if there are gpg errors, do:
@@ -229,6 +216,14 @@ vim /etc/cron.d/zfsutils-linux
 systemctl status cron
 ```
 
+Decrypt after restart:
+```
+zfs load-key -a
+zfs mount tank/data
+# if using minidlna
+systemctl start minidlna
+```
+
 SMB (no CI) (fast)
 ```
 apt install samba
@@ -275,6 +270,7 @@ zfs send -Rcw tank/data@YYYY-MM-DD | zfs receive backup
 apt install minidlna
 # set media directory: media_dir=/foo
 vim /etc/minidlna.conf
+# only enable if not using encryption
 systemctl enable minidlna
 systemctl start minidlna
 ```
@@ -397,6 +393,45 @@ http {
 }
 ```
 
+#### Pi-Hole (FTLDNS)
+
+* ensure that `dnsmasq` is not installed - pihole-FTL replaces dnsmasq
+
+Unbound:
+```sh
+apt install unbound dns-root-data dnsutils
+# copy and edit configuration from:
+# https://docs.pi-hole.net/guides/dns/unbound/#configure-unbound
+vim /etc/unbound/unbound.conf.d/pi-hole.conf
+systemctl enable unbound
+systemctl restart unbound
+# check if unbound works
+dig google.de @127.0.0.1 -p 5335
+dig dnssec.works @127.0.0.1 -p 5335 # NOERROR with IP
+dig fail01.dnssec.works @127.0.0.1 -p 5335 # SERVFAIL without IP
+```
+
+Pi-Hole:
+```sh
+pushd /tmp
+git clone --depth 1 https://github.com/pi-hole/pi-hole.git pi-hole
+cd "pi-hole/automated install/"
+./basic-install.sh
+echo edns-packet-max=1232 > /etc/dnsmasq.d/99-edns.conf
+cd ..
+rm -r pi-hole
+
+# add line `no-resolv`
+vim /etc/dnsmasq.conf
+# add DBINTERVAL=60.0
+vim /etc/pihole/pihole-FTL.conf
+
+systemctl enable pihole-FTL
+systemclt start pihole-FTL
+
+popd
+```
+
 #### Nextcloud
 
 ```
@@ -454,7 +489,7 @@ Test if everything works:
 # test sending directly via msmtp
 printf "Subject: Test\n\nHello World" | msmtp foo@gmx.de
 # test sending via mail
-mail foo@gmx.de <<< test
+mail -s Testmail foo@gmx.de <<< test
 ```
 
 ##### ZFS Event Daemon (ZED)
