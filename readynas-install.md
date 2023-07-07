@@ -252,14 +252,37 @@ mount -t nfs4 10.x.x.x:/data /data
 ```
 
 #### Backup (to external HDD)
-Prepare backup HDD
+Prepare backup HDD (only once initially)
 ```
+# with reencryption
 zpool create -O mountpoint=none -O encryption=aes-256-gcm -O keyformat=passphrase -O pbkdf2iters=10000000 backup /dev/disk/by-id/... #external hdd
+# without reencryption
+zpool create -O mountpoint=none backup /dev/disk/by-id/... #external hdd
 ```
-Full backup (with re-encryption)
+Helpful commands
+```
+# list encryption status
+zfs list -o name,encryption,keystatus,keyformat,keylocation,encryptionroot
+# list all snapshots
+zfs list -t snapshot
+# import all pools
+zpool import -a
+# list zfs label
+zdb -l /dev/sdx1
+# import a pool which can't be imported automatically
+zfs import -a -d /dev/disk/by-id/...
+# upgrade an old pool
+zfs upgrade <pool>
+# decrypt if using reencryption
+zfs load-key backup
+```
+Full backup
 ```
 zfs snapshot -r tank/data@YYYY-MM-DD
-zfs send -Rcw tank/data@YYYY-MM-DD | zfs receive backup
+# with reencryption - needs to be done manually for all snapshots
+zfs send -cv tank/data@YYYY-MM-DD | zfs receive backup/data@YYYY-MM-DD
+# without reencryption
+zfs send -Rcwv tank/data@YYYY-MM-DD | zfs receive -F backup/data
 ```
 
 #### Backup (to remote ZFS pool)
