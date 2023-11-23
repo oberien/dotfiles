@@ -140,6 +140,7 @@ _EOF_
 
 Edit the file `/etc/ssh/sshd_config` and add / uncomment / modify the following settings:
 ```
+ChallengeResponseAuthentication no
 # if using only root
 PermitRootLogin prohibit-password
 # if using separate account
