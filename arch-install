@@ -31,6 +31,11 @@
 #     * e.g. memory-training if required
 #     * initializes the hardware including switching to 64bit
 #     * loads and provides low-level device drivers
+#         * most devices have a binary firmware blob stored on them
+#         * Firmware loads that blob and executes it
+#         * the blob initializes the device
+#         * provides the interface for the Firmware to communicate with the device
+#         * Firmware can then provide the UEFInterface to the device
 # * UEFI
 #     * (technically just an interface to communicate with the firmware;
 #       the firmware still does all these steps)
@@ -87,6 +92,39 @@
 #     * starts all its services
 #     * starts everything else, possibly including XServer (XOrg or Wayland)
 
+# Displays / Monitors / Video during Boot
+# * CPU init
+#     * no graphical output, there is no other device than the CPU
+# * Firmware
+#     * loads and executes the GPU's firmware-blob
+#     * displays e.g. POST screen and BIOS settings via it
+#     * provides the UEFInterface to the GPU
+# * UEFI
+#     * provides raw interface (GOP) to write single pixes
+#     * provides console interface to print lines
+# * Bootmanager / Bootloader
+#     * uses those interfaces to display the menu
+# * EFISTUB
+#     * uses those interface to display the menu
+# * Kernel
+#     * starts vconsole using the UEFI raw video mode as framebuffer backend
+# * /init
+#     * if early kernel mode setting: performs KMS as part of /init
+#     * if late kernel mode settings: performs KMS after /init before /bin/init
+# * kernel mode setting (KMS)
+#     * loads the kernel's graphics drivers corresponding to used GPU(s)
+#     * initializes all displays including resolution
+#     * switches vconsole from UEFI GOP to the GPU drivers
+# * /bin/init
+#     * uses vconsole (which uses GPU drivers)
+# * wayland
+#     * uses kernel GPU driver
+#     * compositor (which renders windows) controls the resolution
+# * XOrg
+#     * loads its own userland driver(s) corresponding to used GPU(s)
+#     * creates its own framebuffers using those drivers
+#     * driver configures each monitor's resolution on-load
+#     * randr can change resolutions
 
 # Boot Setup with Encryption:
 # * initramfs LUKS single disk with `encrypt` hook:
@@ -472,7 +510,10 @@ pacman -S gst-libav
 # useful others
 pikaur -S urxvt-font-size-git
 pacman -S zathura zathura-pdf-mupdf
+# X11
 pacman -S feh
+# wayland
+pacman -S imv
 pacman -S imagemagick
 pacman -S htop iotop
 pacman -S unzip
