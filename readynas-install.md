@@ -120,6 +120,65 @@ UUID=...  /boot/efi       vfat    errors=remount-ro,umask=0077      0       1
 * in BIOS in Boot options, disable everything except the two RAID1 boot partition entries
     * also disable the UEFI console, as it'll run anyway one no other boot device was found
 
+#### mdadm debugging
+
+Useful commands if mdadm errors / has problems.
+```
+# stop all raid arrays
+mdadm --stop --scan
+# reassemble all raid arrays
+mdadm --assemble --scan
+# reassemble stopped raid array
+mdadm --assemble /dev/mdX /dev/sdYZ /dev/sdWV
+
+# reattach out-of-sync drive to degraded raid array for resyncing
+mdadm /dev/mdX -a /dev/sdYZ
+
+# if diagnosing without required mount: make sure the array isn't currently loaded
+cat /proc/mdstat
+echo /dev/md*
+mdadm --stop /dev/mdX
+
+# check status of disks / partitions
+smartctl -a /dev/sdX
+mdadm --examine /dev/sdXY
+
+# mount readonly
+mdadm --assemble /dev/mdX /dev/sdYZ /dev/WV --readonly
+
+# scrub / check REQUIRES READWRITE
+mdadm --assemble /dev/mdX /dev/sdYZ /dev/WV
+mdadm --misc --action=check /dev/mdX
+cat /sys/block/md1/md/sync_action
+cat /sys/block/md1/md/sync_completed
+cat /proc/mdstat
+cat /sys/block/md1/md/mismatch_cnt
+
+# load file as partitioned drive (X = unused number)
+losetup -P /dev/loopX filename
+# stop losetup again
+loset -p /dev/loopX
+
+# mount 2 RAID1 drives as separate degraded RAID arrays
+
+# diff 2 binaries / partitions
+vbindiff /dev/sdXY /dev/sdZW
+```
+
+Resize / grow raid array (offline):
+```
+mdadm --stop --scan
+# p; d 2 <enter>; n 2 <enter> <enter>; t 2 43; p (check first p and second p have same start sector)
+fdisk /dev/sdX
+fdisk /dev/sdY
+mdadm --stop --sync
+mdadm --assemble --sync
+mdadm --grow /dev/mdX --size=max
+fsck /dev/mdX
+e2fsck -f /dev/mdX
+resize2fs /dev/mdX
+```
+
 #### Set up server, ssh etc
 
 * follows relevant parts of <https://github.com/oberien/dotfiles/blob/master/arch-server-install.md>
