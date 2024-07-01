@@ -426,7 +426,7 @@ _EOF_
 mkdir -p /tmp/pikaur_install
 pushd /tmp/pikaur_install
 sudo pacman -S python expac python-requests git python-regex python-dateutil pyalpm python-feedparser --noconfirm --needed
-curl -o PKGBUILD "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=pikaur"
+git clone https://aur.archlinux.org/pikaur.git .
 makepkg PKGBUILD --install --needed
 popd
 rm -rf /tmp/pikaur_install
