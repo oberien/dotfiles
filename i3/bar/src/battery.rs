@@ -60,7 +60,7 @@ pub fn battery(controller: Rc<RefCell<Controller>>, handle: &Handle) -> Box<Futu
                 let icon = match state.trim() {
                     "Charging" => icon::HOURGLASS,
                     "Discharging" => icon::BATTERY,
-                    "Full" => icon::CABLE,
+                    "Full" | "Idle" => icon::CABLE,
                     unk => {
                         controller.push_error(format!("Unknown Battery Status: {}", unk));
                         return Ok(())

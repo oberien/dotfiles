@@ -94,7 +94,7 @@ fn battery(mut e: Block) -> Result<Block, String> {
         let icon = match status {
             "BAT" => icon::BATTERY,
             "CHR" => icon::HOURGLASS,
-            "FULL" => icon::CABLE,
+            "FULL" | "IDLE" => icon::CABLE,
             status => return Err(format!("Unknown Battery Status: {}", status))
         };
         let mut res = format!("{} {}", icon, percentage);
