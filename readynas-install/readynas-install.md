@@ -34,7 +34,7 @@ Our Setup:
 Prepare debian installation USB-drive:
 * download small USB sticks image: <https://www.debian.org/distrib/netinst.en.html#smallcd>
 * dd the iso over onto the usb drive (and sync)
-* move over the usb drive and connect it to the NAS
+* connect the usb drive to the NAS
 
 Connect Serial Console:
 * remove sticker from back of NAS from UART Port
@@ -56,6 +56,8 @@ Prepare system SD Cards:
 * for both disks: `fdisk /dev/sdX`, `g;n,,,+512M,[y];n,,,,[y];t,1,1;t,2,raid;w`
 * create md arrays:
 ```
+# metadata version 0.90 puts the metadata at the end of the partition
+# making it look like a regular FAT32 to the BIOS for booting
 mdadm --create /dev/md127 --metadata=0.90 --level=1 --raid-devices=2 /dev/sdX1 /dev/sdY1
 mdadm --create /dev/md1 --level=1 --raid-devices=2 /dev/sdX2 /dev/sdY2
 mkfs.fat -F32 /dev/md127
@@ -182,6 +184,25 @@ resize2fs /dev/mdX
 #### Set up server, ssh etc
 
 * follows relevant parts of <https://github.com/oberien/dotfiles/blob/master/arch-server-install.md>
+
+#### Automatic updates (`cron-apt`)
+
+```
+apt install cron-apt
+```
+
+`/etc/cron-apt/config`:
+```
+MAILTO="foo@gmx.de"
+MAILON="upgrade" # always, upgrade, error
+```
+
+`/etc/cron-apt/action.d/3-download`:
+remove `-d` (download-only) flag
+
+check `/etc/cron.d/cron-apt`
+
+test cron-apt from cli: `cron-apt`
 
 #### Install Fan Driver
 
@@ -310,6 +331,39 @@ pacman -S nfs-utils
 mount -t nfs4 10.x.x.x:/data /data
 ```
 
+#### ZFS Event Daemon (ZED)
+
+Requires Email-Notification setup as linked below.
+
+Ensure the following config parameters in `/etc/zfs/zed.d/zed.rc`:
+```
+ZED_EMAIL_ADDR="root"
+ZED_NOTIFY_VERBOSE=1
+ZED_NOTIFY_DATA=1
+ZED_SYSLOG_TAG="zed"
+```
+
+Modify `/etc/zfs/zed.d/statechange-notify.sh` with the changes in
+<https://github.com/cbane/zfs/commit/f4f16389413061ed0b670df1cbd17954518a3096>.
+
+Ensure zed is running:
+```
+systemctl status zed
+systemctl restart zed
+# if it wasn't started automatically:
+systemctl enable zed
+```
+
+Test sending a mail:
+```
+truncate -s 512M /dev/shm/test
+zpool create test /dev/shm/test
+zpool scrub test
+# email should be received now
+zpool destroy test
+rm /dev/shm/test
+```
+
 #### Backup (to external HDD)
 Prepare backup HDD (only once initially)
 ```
@@ -346,208 +400,18 @@ zfs send -Rcwv tank/data@YYYY-MM-DD | zfs receive -F backup/data
 
 #### Backup (to remote ZFS pool)
 
-#### DLNA
+#### Services
 
-```
-apt install minidlna
-# set media directory: media_dir=/foo
-vim /etc/minidlna.conf
-# only enable if not using encryption
-systemctl enable minidlna
-systemctl start minidlna
-```
+* [DLNA](./dlna.md)
+* [nginx with Letsencrypt and WebDAV](./nginx-letsencrypt-webdav.md)
+* [Pi-Hole (FTLDNS)](./pihole.md)
+* [MQTT (mosquitto)](./mqtt.md)
+* [Email notifications (msmtp)](./email-notifications.md)
+    * [smartd](./smartd.md)
+* [Wireguard VPN](./wireguard-vpn.md)
+* [Poor Man's git](./poor-mans-git.md)
 
-#### nginx and Let's Encrypt
-
-```
-apt install nginx python3-certbot-nginx
-```
-
-* general nginx file structure:
-    * `/etc/nginx/nginx.conf` contains global config which are the same for every server
-    * `/etc/nginx/sites-available/` contains configs for each server respectively
-    * `/etc/nginx/sites-enabled/` contains symlinks to `sites-available/...`
-* test setup:
-    * remove `sites-enabled/default`
-    * set up test site under location `/test` partially following <https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-debian-10>
-    * test config with `nginx -t`
-    * apply with `systemctl reload nginx`
-    * for connection reset: `return 444;`
-    * set up server config following <https://nginx.org/en/docs/beginners_guide.html>
-* let's encrypt + ssl:
-    * set up ssl parameters following <https://wiki.mozilla.org/Security/Server_Side_TLS>
-    * `certbot --nginx -d your_domain`
-    * ensure proper configuration of `/etc/cron.d/certbot`
-
-#### nginx WebDAV
-
-* on Windows, set `HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\WebClient\Parameters\FileSizeLimitInBytes=0xFFFFFFFF` to increase file size limit from 50MB (default) to 4GiB
-
-```nginx
-# in case the distro requires it:
-load_module /usr/lib/nginx/modules/ngx_http_dav_ext_module.so;
-load_module /usr/lib/nginx/modules/ngx_http_headers_more_filter_module.so;
-# on debian this is just: apt install libnginx-mod-http-dav-ext libnginx-mod-http-headers-more-filter
-
-http {
-    dav_ext_lock_zone zone=foo:10m;
-
-    server {
-        # Note: MUST NOT include trailing slash
-        location /webdav {
-            # alias is not supported, and there is no (easy) way to do rewrites
-            # so this actually goes to /path/to/folder/webdav/
-            root /path/to/folder/;
-
-            # the easy part
-            dav_methods PUT DELETE MKCOL COPY MOVE;
-            dav_ext_methods PROPFIND OPTIONS LOCK UNLOCK;
-            dav_ext_lock zone=foo;
-            dav_access user:rw group:rw all:rw;
-
-            # useful stuff
-            client_max_body_size 0;
-            send_timeout 3600;
-            client_body_timeout 3600;
-            keepalive_timeout 3600;
-            lingering_timeout 3600;
-            create_full_put_path on;
-
-            # the hard parts
-            if ($request_method = PROPPATCH) { # Unsupported, always return OK.
-                add_header Content-Type 'text/xml';
-                return 207 '<?xml version="1.0"?><a:multistatus xmlns:a="DAV:"><a:response><a:propstat><a:status>HTTP/1.1 200 OK</a:status></a:propstat></a:response></a:multistatus>';
-            }
-
-            # fixed version of https://www.robpeck.com/2020/06/making-webdav-actually-work-on-nginx/
-            set $flags "";
-
-            # check for COPY/MOVE request
-            if ($request_method = MOVE) {
-                set $flags "${flags}M";
-            }
-            if ($request_method = COPY) {
-                set $flags "${flags}M";
-            }
-
-            # check for directory-targeting request: either targets
-            # an existing directory, or uses MKCOL to create a new one
-            if (-d $request_filename) {
-                set $flags "${flags}D";
-            }
-            if ($request_method = MKCOL) {
-                set $flags "${flags}D";
-            }
-
-            # check for missing trailing slash in Destination header
-            if ($http_destination ~ [^/]$) {
-                set $flags "${flags}R";
-            }
-
-            # for all directory-targeting requests, add the
-            # (potentially missing) trailing slash
-            if ($flags ~ "D") {
-                rewrite ^(.*[^/])$ $1/;
-            }
-
-            # for
-            # 1. a MOVE/COPY request ("M")
-            # 2. targeting a directory ("D")
-            # 3. where the Destination header is missing a trailing slash ("R")
-            # we need to add the trailing slash to the Destination header
-            if ($flags = "MDR") {
-                more_set_input_headers "Destination: ${http_destination}/";
-            }
-            # important: the order is relevant
-            # the rewrite must be placed before the more_set_input_headers
-            # or else the latter just won't work. no idea why.
-
-
-            # note for testing: windows will refuse to use basic auth over unencrypted http
-            # you can change that in the registry:
-            # HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\WebClient\Parameters\BasicAuthLevel=2
-            auth_basic "webdav";
-            auth_basic_user_file "/etc/nginx/.htpasswd-webdav";
-            # the htpasswd file can use `<username>:{PLAIN}<password>`
-            # e.g. `myuser:{PLAIN}asdfasdf`
-        }
-    }
-}
-```
-
-#### Pi-Hole (FTLDNS)
-
-* ensure that `dnsmasq` is not installed - pihole-FTL replaces dnsmasq
-
-Unbound:
-```sh
-apt install unbound dns-root-data dnsutils
-# copy and edit configuration from:
-# https://docs.pi-hole.net/guides/dns/unbound/#configure-unbound
-vim /etc/unbound/unbound.conf.d/pi-hole.conf
-systemctl enable unbound
-systemctl restart unbound
-# check if unbound works
-dig google.de @127.0.0.1 -p 5335
-dig dnssec.works @127.0.0.1 -p 5335 # NOERROR with IP
-dig fail01.dnssec.works @127.0.0.1 -p 5335 # SERVFAIL without IP
-```
-
-Pi-Hole:
-```sh
-pushd /tmp
-git clone --depth 1 https://github.com/pi-hole/pi-hole.git pi-hole
-cd "pi-hole/automated install/"
-./basic-install.sh
-echo edns-packet-max=1232 > /etc/dnsmasq.d/99-edns.conf
-cd ..
-rm -r pi-hole
-
-# add line `no-resolv`
-vim /etc/dnsmasq.conf
-# add DBINTERVAL=60.0
-vim /etc/pihole/pihole-FTL.conf
-
-systemctl enable pihole-FTL
-systemclt start pihole-FTL
-
-popd
-```
-
-#### MQTT
-
-```
-apt install mosquitto mosquitto-clients
-# add the following things:
-# allow_anonymous true
-# listener 1883
-vim /etc/mosquitto/mosquitto.conf
-systemctl restart mosquitto
-# test
-mosquitto_sub -t 'test/#' -v
-mosquitto_pub -t 'test/foo' -m 'lol'
-```
-
-#### git
-
-Modified from <https://git-scm.com/book/en/v2/Git-on-the-Server-Setting-Up-the-Server>:
-```sh
-zfs create -o encryption=aes-256-gcm -o keyformat=raw -o keylocation=file:///keys/keyfile_zfs -o atime=off -o compression=lz4 -o dedup=on -o mountpoint=/home/git tank/git-home
-adduser git
-mkdir /home/git/.ssh
-chmod 700 /home/git/.ssh
-echo "# always prepend 'no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty'" > /home/git/.ssh/authorized_keys
-chmod 600 /home/git/.ssh/authorized_keys
-chown -R git:git /home/git
-echo `which git-shell` >> /etc/shells
-chsh git -s $(which git-shell)
-
-# add new empty repository
-sudo -iu git
-git init --bare foo.git
-```
-
-#### Nextcloud
+#### Nextcloud (doesn't work)
 
 ```
 apt install docker-compose
@@ -563,115 +427,6 @@ apt install docker-compose
 apt update && apt upgrade
 apt install nextcloud-server
 ```
-
-#### Email Notifications
-
-##### Setup E-Mail client
-
-Setup `msmtp` (and `mail` to use `msmtp`):
-```
-apt install msmtp msmtp-mta bsd-mailx
-apt purge mailutils
-```
-`/etc/msmtprc`:
-```
-defaults
-auth on
-tls on
-tls_trust_file /etc/ssl/certs/ca-certificates.crt
-syslog LOG_MAIL
-aliases /etc/aliases
-
-account gmx
-host mail.gmx.net
-port 587
-from foo@gmx.de
-user foo@gmx.de
-passwordeval "cat /root/.ssh/msmtp-gmx-password"
-set_from_header on
-undisclosed_recipients on
-
-account default : gmx
-```
-`/etc/aliases`:
-```
-#...
-default: foo@gmx.de
-```
-
-Test if everything works:
-```
-# test sending directly via msmtp
-printf "Subject: Test\n\nHello World" | msmtp foo@gmx.de
-# test sending via mail
-mail -s Testmail foo@gmx.de <<< test
-```
-
-##### ZFS Event Daemon (ZED)
-
-Ensure the following config parameters in `/etc/zfs/zed.d/zed.rc`:
-```
-ZED_EMAIL_ADDR="root"
-ZED_NOTIFY_VERBOSE=1
-ZED_NOTIFY_DATA=1
-ZED_SYSLOG_TAG="zed"
-```
-
-Modify `/etc/zfs/zed.d/statechange-notify.sh` with the changes in
-<https://github.com/cbane/zfs/commit/f4f16389413061ed0b670df1cbd17954518a3096>.
-
-Ensure zed is running:
-```
-systemctl status zed
-systemctl restart zed
-# if it wasn't started automatically:
-systemctl enable zed
-```
-
-Test sending a mail:
-```
-truncate -s 512M /dev/shm/test
-zpool create test /dev/shm/test
-zpool scrub test
-# email should be received now
-zpool destroy test
-rm /dev/shm/test
-```
-
-##### Smartd
-
-`/etc/smartd.conf`:
-```
-#...
-DEVICESCAN -d removable -m root -s S/../../7/01 -M test -M daily -M exec /usr/share/smartmontools/smartd-runner
-#...
-```
-
-Test sending a mail:
-```
-systemctl restart smartd
-```
-
-Disable test mail: In `/etc/smartd.conf` remove `-M test`
-
-#### Automatic updates (`cron-apt`)
-
-```
-apt install cron-apt
-```
-
-`/etc/cron-apt/config`:
-```
-MAILTO="foo@gmx.de"
-MAILON="upgrade" # always, upgrade, error
-```
-
-`/etc/cron-apt/action.d/3-download`:
-remove `-d` (download-only) flag
-
-check `/etc/cron.d/cron-apt`
-
-test cron-apt from cli: `cron-apt`
 
 
 #### Manually Compile Kernel
