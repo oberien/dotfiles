@@ -122,6 +122,10 @@ UUID=...  /boot/efi       vfat    errors=remount-ro,umask=0077      0       1
 * in BIOS in Boot options, disable everything except the two RAID1 boot partition entries
     * also disable the UEFI console, as it'll run anyway one no other boot device was found
 
+#### Switch from RAID1 to ZFS for root partition
+
+* [switch-to-zfs-root.md](./switch-to-zfs-root.md)
+
 #### mdadm debugging
 
 Useful commands if mdadm errors / has problems.
@@ -135,6 +139,10 @@ mdadm --assemble /dev/mdX /dev/sdYZ /dev/sdWV
 
 # reattach out-of-sync drive to degraded raid array for resyncing
 mdadm /dev/mdX -a /dev/sdYZ
+
+# manually fail and remove a drive from a raid array
+mdadm /dev/mdX --fail /dev/sdYZ
+mdadm /dev/mdX --remove /dev/sdYZ
 
 # if diagnosing without required mount: make sure the array isn't currently loaded
 cat /proc/mdstat
@@ -281,7 +289,7 @@ reboot
 apt install zfs-dkms
 ls /dev/disk/by-id/
 zpool create -O mountpoint=none tank raidz2 <hdd-ids...> cache <ssd-id>
-# check ashift
+# check ashift=12
 zdb -C | grep ashift
 dd if=/dev/urandom of=/keys/keyfile_zfs bs=1 count=32
 zfs create -o encryption=aes-256-gcm -o keyformat=raw -o keylocation=file:///keys/keyfile_zfs -o atime=off -o compression=lz4 -o dedup=on -o mountpoint=/data tank/data
