@@ -418,6 +418,7 @@ zfs send -Rcwv tank/data@YYYY-MM-DD | zfs receive -F backup/data
     * [smartd](./smartd.md)
 * [Wireguard VPN](./wireguard-vpn.md)
 * [Poor Man's git](./poor-mans-git.md)
+* [Remote systemd / journal logging](./remote-journal.md)
 
 #### Nextcloud (doesn't work)
 
