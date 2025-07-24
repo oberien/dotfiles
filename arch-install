@@ -546,11 +546,12 @@ pacman -Syu
 # Sound
 pacman -S realtime-privileges
 gpasswd -a $USER realtime
-pacman -S lsp-plugins
 # pulse
 pacman -S pulseaudio
 # jack
 pacman -S cadence carla jack2 lib32-jack2 pulseaudio-jack
+# plugins for Carla
+pacman -S noise-suppression-for-voice calf ladspa lsp-plugins-ladspa lsp-plugins
 # comment out the `Exec=`-line in /usr/share/dbus-1/services/org.jackaudio.service
 # pipewire
 pacman -S easyeffects lib32-pipewire lib32-pipewire-jack pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber carla
